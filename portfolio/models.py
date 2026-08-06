@@ -14,3 +14,20 @@ class Portfolio(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Portfolio"
+
+
+class Holding(models.Model):
+    portfolio = models.ForeignKey(
+        Portfolio,
+        on_delete=models.CASCADE,
+        related_name="holdings"
+    )
+    stock_symbol = models.CharField(max_length=10)
+    quantity = models.PositiveIntegerField(default=0)
+    average_buy_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    def __str__(self):
+        return f"{self.stock_symbol} ({self.quantity})"
