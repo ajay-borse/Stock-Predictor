@@ -1,9 +1,8 @@
 import os
 import joblib
-import pandas as pd
 
 from train_model import train_model
-from feature_engineering import create_features
+from feature_engineering import create_prediction_features
 
 
 def predict_stock(symbol):
@@ -16,27 +15,58 @@ def predict_stock(symbol):
         print("Training new model...")
         train_model(symbol)
 
-    # Load model
+        # If training failed, stop here
+        if not os.path.exists(model_path):
+            return {
+                "error": "Model could not be created. Check the stock symbol."
+            }
+
+    # Load trained model
     model = joblib.load(model_path)
 
     # Get latest processed data
-    data = create_features(symbol)
-    # Last row
+    data = create_prediction_features(symbol)
+
+    if data is None:
+        return {
+            "error": "Unable to fetch stock data."
+        }
+
+    # Latest row
     latest = data.iloc[-1]
 
+    # 🔍 Debug: Print latest row
+    print("\n==============================")
+    print("LATEST ROW USED FOR PREDICTION")
+    print("==============================")
+    print(latest)
+    print("==============================\n")
+
+    # Features for prediction
     X = latest[["Close", "MA5", "MA10"]].values.reshape(1, -1)
 
+    # Predict tomorrow's price
     prediction = model.predict(X)[0]
 
-    print("\nPrediction Result")
-    print("----------------------")
-    print("Symbol :", symbol)
-    print("Current Price :", latest["Target"])
-    print("Tomorrow Prediction :", prediction)
+    # Return JSON data
+    return {
+        "symbol": symbol,
+        "current_price": float(latest["Close"]),
+        "predicted_price": float(prediction)
+    }
 
 
 if __name__ == "__main__":
 
     symbol = input("Enter Stock Symbol : ").upper()
 
-    predict_stock(symbol)
+    result = predict_stock(symbol)
+
+    if "error" in result:
+        print(result["error"])
+    else:
+        print("\nPrediction Result")
+        print("----------------------")
+        print(f"Symbol : {result['symbol']}")
+        print(f"Current Price : {result['current_price']}")
+        print(f"Tomorrow Prediction : {result['predicted_price']}")

@@ -16,11 +16,26 @@ def create_features(symbol):
     # Tomorrow's Closing Price (Target)
     data["Target"] = data["Close"].shift(-1)
 
-    # Remove rows with missing values
+    # Remove rows with missing values (for training)
     data = data.dropna()
 
     print("\nFeature Engineered Data:")
     print(data.head())
+
+    return data
+
+
+def create_prediction_features(symbol):
+    data = preprocess_stock(symbol)
+
+    if data is None:
+        return None
+
+    data["MA5"] = data["Close"].rolling(window=5).mean()
+    data["MA10"] = data["Close"].rolling(window=10).mean()
+
+    # Only remove rows where MA values are missing
+    data = data.dropna(subset=["MA5", "MA10"])
 
     return data
 

@@ -1,17 +1,22 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import yfinance as yf
+from rest_framework import status
+
+from .predictor import predict_stock
 
 
-class StockPriceView(APIView):
+class StockPredictionView(APIView):
 
-    def get(self, request, symbol):
+    def post(self, request):
 
-        stock = yf.Ticker(symbol)
+        symbol = request.data.get("symbol")
 
-        info = stock.fast_info
+        if not symbol:
+            return Response(
+                {"error": "Stock symbol is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        return Response({
-            "symbol": symbol,
-            "price": info.get("lastPrice")
-        })
+        result = predict_stock(symbol.upper())
+
+        return Response(result)

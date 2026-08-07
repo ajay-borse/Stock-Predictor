@@ -1,6 +1,9 @@
 from django.urls import path
-from .views import StockPriceView
+from .views import StockPredictionView
 
 urlpatterns = [
-    path("<str:symbol>/", StockPriceView.as_view()),
+    path(
+        "predict/",
+        StockPredictionView.as_view()
+    ),
 ]
