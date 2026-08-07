@@ -2,7 +2,7 @@ import joblib
 
 from sklearn.linear_model import LinearRegression
 
-from feature_engineering import create_features
+from .feature_engineering import create_features
 
 
 def train_model(symbol):

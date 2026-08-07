@@ -1,8 +1,8 @@
 import os
 import joblib
 
-from train_model import train_model
-from feature_engineering import create_prediction_features
+from .train_model import train_model
+from .feature_engineering import create_prediction_features
 
 
 def predict_stock(symbol):

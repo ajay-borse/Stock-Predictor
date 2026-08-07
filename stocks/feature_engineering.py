@@ -1,4 +1,4 @@
-from preprocess import preprocess_stock
+from .preprocess import preprocess_stock
 
 
 def create_features(symbol):

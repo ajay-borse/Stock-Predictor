@@ -1,5 +1,5 @@
 import pandas as pd
-from download_data import download_stock
+from .download_data import download_stock
 
 
 def preprocess_stock(symbol):
