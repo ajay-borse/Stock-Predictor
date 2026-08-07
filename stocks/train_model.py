@@ -25,7 +25,7 @@ def train_model(symbol):
     model.fit(X, y)
 
     # Save Model
-    joblib.dump(model, "stock_model.pkl")
+    joblib.dump(model, f"models/{symbol}_model.pkl")
 
     print("\n✅ Model Trained Successfully!")
 
