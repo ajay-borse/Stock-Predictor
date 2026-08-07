@@ -9,6 +9,12 @@ def preprocess_stock(symbol):
         print("No data found.")
         return None
 
+  
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = data.columns.get_level_values(0)
+
+    data = data.reset_index()
+
     print("\nFirst 5 Rows:")
     print(data.head())
 
