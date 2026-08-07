@@ -54,3 +54,20 @@ class SellStockView(APIView):
             {"message": "Stock sold successfully"},
             status=status.HTTP_200_OK
         )
+class PortfolioSummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        portfolio = request.user.portfolio
+
+        serializer = HoldingSerializer(
+            portfolio.holdings.all(),
+            many=True
+        )
+
+        return Response({
+            "balance": portfolio.balance,
+            "total_investment": portfolio.total_investment,
+            "total_profit_loss": portfolio.total_profit_loss,
+            "holdings": serializer.data
+        })   
