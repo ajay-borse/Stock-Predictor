@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'portfolio',
     'accounts',
     "transactions",
+    "stocks",
     
 ]
 AUTH_USER_MODEL = "accounts.User"
