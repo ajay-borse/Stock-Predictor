@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 
 from .models import Holding
 from .serializers import HoldingSerializer
+from transactions.models import Transaction
 
 
 class BuyStockView(APIView):
@@ -17,7 +18,16 @@ class BuyStockView(APIView):
         serializer = HoldingSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(portfolio=portfolio)
+            holding = serializer.save(portfolio=portfolio)
+
+            Transaction.objects.create(
+                user=request.user,
+                stock_symbol=holding.stock_symbol,
+                transaction_type="BUY",
+                quantity=holding.quantity,
+                price=holding.average_buy_price
+            )
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -43,6 +53,14 @@ class SellStockView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        Transaction.objects.create(
+            user=request.user,
+            stock_symbol=holding.stock_symbol,
+            transaction_type="SELL",
+            quantity=quantity,
+            price=holding.average_buy_price
+        )
+
         holding.quantity -= quantity
 
         if holding.quantity == 0:
@@ -54,6 +72,8 @@ class SellStockView(APIView):
             {"message": "Stock sold successfully"},
             status=status.HTTP_200_OK
         )
+
+
 class PortfolioSummaryView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -70,4 +90,4 @@ class PortfolioSummaryView(APIView):
             "total_investment": portfolio.total_investment,
             "total_profit_loss": portfolio.total_profit_loss,
             "holdings": serializer.data
-        })   
+        })
