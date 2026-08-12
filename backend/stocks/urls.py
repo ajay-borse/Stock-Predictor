@@ -1,6 +1,10 @@
 from django.urls import path
 
-from .views import StockPredictionView, StockHistoryView
+from .views import (
+    StockPredictionView,
+    StockHistoryView,
+    WatchlistView
+)
 
 
 urlpatterns = [
@@ -13,6 +17,11 @@ urlpatterns = [
     path(
         "history/",
         StockHistoryView.as_view()
+    ),
+
+    path(
+        "watchlist/",
+        WatchlistView.as_view()
     ),
 
 ]
