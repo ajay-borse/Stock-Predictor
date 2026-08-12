@@ -79,14 +79,10 @@ function Register() {
     const { id, value } = e.target;
     setFormData(prev => ({ ...prev, [id]: value }));
     
-    // Clear global error
     setGlobalError(null);
-
-    // Validate the specific field
     const fieldError = validateField(id, value);
     setErrors(prev => ({ ...prev, [id]: fieldError }));
 
-    // Real-time password matching check if modifying either password field
     if (id === 'password' || id === 'confirm_password') {
        const pwd = id === 'password' ? value : formData.password;
        const cpwd = id === 'confirm_password' ? value : formData.confirm_password;
@@ -94,7 +90,7 @@ function Register() {
          if (pwd !== cpwd) {
            setErrors(prev => ({ ...prev, confirm_password: 'Passwords do not match.' }));
          } else {
-           setErrors(prev => ({ ...prev, confirm_password: '' })); // Valid match
+           setErrors(prev => ({ ...prev, confirm_password: '' })); 
          }
        }
     }
@@ -103,7 +99,6 @@ function Register() {
   const handleRegister = async (e) => {
     e.preventDefault();
     
-    // Validate all fields
     const newErrors = {};
     Object.keys(formData).forEach(key => {
       const err = validateField(key, formData[key]);
@@ -144,7 +139,7 @@ function Register() {
            setGlobalError(gError || 'Registration failed. Please try again.');
         }
       } else {
-        setGlobalError('Unable to connect to the server.');
+        setGlobalError('Backend registration API is not yet available. Or unable to connect to the server.');
       }
     } finally {
       setLoading(false);
@@ -153,98 +148,101 @@ function Register() {
 
   if (isSuccess) {
     return (
-      <div className="app-container">
-        <main className="main-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="success-card scale-in-animation">
-            <div className="success-icon-wrapper">
-              <svg className="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-                <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
-                <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+      <div className="success-container">
+        <div className="light-sweep"></div>
+        <div className="success-content">
+          <div className="glowing-ring">
+            <div className="ring-circle"></div>
+            <div className="premium-check">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
               </svg>
             </div>
-            <h2 className="success-title">Registration Successful!</h2>
-            <p className="success-message">Welcome to the family! 🎉<br/>Your account has been successfully created.</p>
-            <div className="redirect-message">
-              Redirecting you to Login... <span className="countdown">{countdown}</span>
-            </div>
           </div>
-        </main>
+          <h2 className="success-title">Welcome to the Intelligence.</h2>
+          <p className="success-message">
+            Your account has been successfully created.<br/>
+            Welcome to StockMind AI.
+          </p>
+          <div className="countdown-box">
+            <span style={{color: 'var(--text-muted)'}}>Preparing your workspace in </span> 
+            <span className="countdown-number">0{countdown}</span>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="app-container">
-      <nav className="navbar">
-        <h1>📈 AI Stock Predictor</h1>
-      </nav>
+    <div className="auth-layout" style={{ display: 'block', padding: '2rem 1rem' }}>
+      <div className="register-container">
+        
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '2.5rem', color: '#fff', marginBottom: '0.5rem' }}>Create your account</h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Join the next generation of intelligent investing.</p>
+        </div>
 
-      <main className="main-content">
-        <section className="header-section">
-          <h2>Create Your Account</h2>
-          <p>Join to access advanced stock predictions.</p>
-        </section>
-
-        <div className="predictor-card register-card">
-          <form onSubmit={handleRegister} className="register-form">
+        <div className="glass-card">
+          <form onSubmit={handleRegister}>
             
             <div className="input-group">
-              <label htmlFor="username">Username *</label>
-              <input id="username" type="text" className={`symbol-input ${errors.username ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.username} onChange={handleChange} disabled={loading} placeholder="Choose a username" />
+              <label htmlFor="username">Username</label>
+              <input id="username" type="text" className={`premium-input ${errors.username ? 'input-error' : ''}`} value={formData.username} onChange={handleChange} disabled={loading} placeholder="Choose a username" />
               {errors.username && <span className="field-error">{errors.username}</span>}
             </div>
 
             <div className="form-row">
               <div className="input-group">
-                <label htmlFor="first_name">First Name *</label>
-                <input id="first_name" type="text" className={`symbol-input ${errors.first_name ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.first_name} onChange={handleChange} disabled={loading} />
+                <label htmlFor="first_name">First Name</label>
+                <input id="first_name" type="text" className={`premium-input ${errors.first_name ? 'input-error' : ''}`} value={formData.first_name} onChange={handleChange} disabled={loading} placeholder="First name" />
                 {errors.first_name && <span className="field-error">{errors.first_name}</span>}
               </div>
               <div className="input-group">
-                <label htmlFor="middle_name">Middle Name</label>
-                <input id="middle_name" type="text" className="symbol-input" style={{ textTransform: 'none' }} value={formData.middle_name} onChange={handleChange} disabled={loading} />
+                <label htmlFor="middle_name">Middle Name (Optional)</label>
+                <input id="middle_name" type="text" className="premium-input" value={formData.middle_name} onChange={handleChange} disabled={loading} placeholder="Middle name" />
               </div>
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="last_name">Last Name *</label>
-              <input id="last_name" type="text" className={`symbol-input ${errors.last_name ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.last_name} onChange={handleChange} disabled={loading} />
-              {errors.last_name && <span className="field-error">{errors.last_name}</span>}
             </div>
 
             <div className="form-row">
               <div className="input-group">
-                <label htmlFor="phone_number">Phone Number *</label>
-                <input id="phone_number" type="tel" className={`symbol-input ${errors.phone_number ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.phone_number} onChange={handleChange} disabled={loading} placeholder="+1234567890" />
-                {errors.phone_number && <span className="field-error">{errors.phone_number}</span>}
+                <label htmlFor="last_name">Last Name</label>
+                <input id="last_name" type="text" className={`premium-input ${errors.last_name ? 'input-error' : ''}`} value={formData.last_name} onChange={handleChange} disabled={loading} placeholder="Last name" />
+                {errors.last_name && <span className="field-error">{errors.last_name}</span>}
               </div>
               <div className="input-group">
-                <label htmlFor="date_of_birth">Date of Birth *</label>
-                <input id="date_of_birth" type="date" className={`symbol-input ${errors.date_of_birth ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.date_of_birth} onChange={handleChange} disabled={loading} max={new Date().toISOString().split('T')[0]} />
+                <label htmlFor="phone_number">Phone Number</label>
+                <input id="phone_number" type="tel" className={`premium-input ${errors.phone_number ? 'input-error' : ''}`} value={formData.phone_number} onChange={handleChange} disabled={loading} placeholder="+1234567890" />
+                {errors.phone_number && <span className="field-error">{errors.phone_number}</span>}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="input-group">
+                <label htmlFor="email">Email Address</label>
+                <input id="email" type="email" className={`premium-input ${errors.email ? 'input-error' : ''}`} value={formData.email} onChange={handleChange} disabled={loading} placeholder="Enter your email" />
+                {errors.email && <span className="field-error">{errors.email}</span>}
+              </div>
+              <div className="input-group">
+                <label htmlFor="date_of_birth">Date of Birth</label>
+                <input id="date_of_birth" type="date" className={`premium-input ${errors.date_of_birth ? 'input-error' : ''}`} value={formData.date_of_birth} onChange={handleChange} disabled={loading} max={new Date().toISOString().split('T')[0]} />
                 {errors.date_of_birth && <span className="field-error">{errors.date_of_birth}</span>}
               </div>
             </div>
 
-            <div className="input-group">
-              <label htmlFor="email">Email Address *</label>
-              <input id="email" type="email" className={`symbol-input ${errors.email ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.email} onChange={handleChange} disabled={loading} />
-              {errors.email && <span className="field-error">{errors.email}</span>}
-            </div>
-
             <div className="form-row">
-              <div className="input-group relative-group">
-                <label htmlFor="password">Password *</label>
+              <div className="input-group">
+                <label htmlFor="password">Password</label>
                 <div className="password-wrapper">
-                  <input id="password" type={showPassword ? "text" : "password"} className={`symbol-input ${errors.password ? 'input-error' : ''}`} style={{ textTransform: 'none' }} value={formData.password} onChange={handleChange} disabled={loading} />
+                  <input id="password" type={showPassword ? "text" : "password"} className={`premium-input ${errors.password ? 'input-error' : ''}`} value={formData.password} onChange={handleChange} disabled={loading} placeholder="Create password" />
                   <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "Hide" : "Show"}</button>
                 </div>
                 {errors.password && <span className="field-error">{errors.password}</span>}
               </div>
 
-              <div className="input-group relative-group">
-                <label htmlFor="confirm_password">Confirm Password *</label>
+              <div className="input-group">
+                <label htmlFor="confirm_password">Confirm Password</label>
                 <div className="password-wrapper">
-                  <input id="confirm_password" type={showConfirmPassword ? "text" : "password"} className={`symbol-input ${errors.confirm_password ? 'input-error' : formData.confirm_password && !errors.confirm_password ? 'input-success' : ''}`} style={{ textTransform: 'none' }} value={formData.confirm_password} onChange={handleChange} disabled={loading} />
+                  <input id="confirm_password" type={showConfirmPassword ? "text" : "password"} className={`premium-input ${errors.confirm_password ? 'input-error' : formData.confirm_password && !errors.confirm_password ? 'input-success' : ''}`} value={formData.confirm_password} onChange={handleChange} disabled={loading} placeholder="Confirm password" />
                   <button type="button" className="password-toggle" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>{showConfirmPassword ? "Hide" : "Show"}</button>
                 </div>
                 {errors.confirm_password && <span className="field-error">❌ {errors.confirm_password}</span>}
@@ -253,21 +251,21 @@ function Register() {
             </div>
 
             {globalError && (
-              <div className="error-message">
+              <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid var(--error-color)', borderRadius: '4px', color: 'var(--error-color)', fontSize: '0.9rem' }}>
                 ⚠️ {globalError}
               </div>
             )}
 
-            <button type="submit" className="predict-btn" style={{ width: '100%', marginTop: '1rem' }} disabled={loading}>
+            <button type="submit" className="primary-btn" style={{ marginTop: '2rem' }} disabled={loading}>
               {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
-          <div style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-            Already have an account? <Link to="/login" style={{ color: 'var(--primary-color)', fontWeight: '600', textDecoration: 'none' }}>Sign In</Link>
+          <div style={{ marginTop: '2rem', textAlign: 'center', color: 'var(--text-muted)' }}>
+            Already have an account? <Link to="/login" style={{ color: 'var(--primary-color)', fontWeight: '600' }}>Sign In</Link>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
