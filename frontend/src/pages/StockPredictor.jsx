@@ -13,10 +13,10 @@ function StockPredictor() {
   const [loadingStep, setLoadingStep] = useState(0);
   const loadingMessages = [
     "Fetching market data...",
-    "Analyzing price history...",
-    "Calculating indicators...",
-    "Running prediction model...",
-    "Generating insight..."
+    "Analyzing market data",
+    "Processing price history",
+    "Running prediction model",
+    "Generating prediction"
   ];
 
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ function StockPredictor() {
     e.preventDefault(); 
     
     if (!symbol.trim()) {
-      setError("Please enter a valid stock symbol (e.g., INFY.NS)");
+      setError("Please enter a valid stock symbol.");
       return;
     }
 
@@ -60,11 +60,11 @@ function StockPredictor() {
       setPrediction(response.data);
     } catch (err) {
       if (err.response && err.response.status === 401) {
-        setError("Authentication failed. Please login again.");
+        setError("Your session has expired. Please login again.");
       } else if (err.request && !err.response) {
-        setError("Unable to connect to backend. Please check your connection or CORS settings.");
+        setError("Unable to connect to the prediction server.");
       } else {
-        setError("Failed to fetch prediction.");
+        setError("Unable to generate prediction. Please try again.");
       }
     } finally {
       // Small artificial delay to allow animation to finish if API is too fast
@@ -72,13 +72,28 @@ function StockPredictor() {
     }
   };
 
-  const isBullish = prediction && (prediction.predicted_price > prediction.current_price);
-  
-  // Calculate percentage change safely
+  // Derive metrics safely from the exact returned response
+  let difference = 0;
   let percentageChange = 0;
-  if (prediction && prediction.current_price > 0) {
-    percentageChange = ((prediction.predicted_price - prediction.current_price) / prediction.current_price) * 100;
+  let direction = "NEUTRAL";
+  let dirClass = "metric-neutral";
+
+  if (prediction && prediction.current_price && prediction.predicted_price) {
+    difference = prediction.predicted_price - prediction.current_price;
+    percentageChange = (difference / prediction.current_price) * 100;
+
+    if (prediction.predicted_price > prediction.current_price) {
+      direction = "UPWARD";
+      dirClass = "metric-positive";
+    } else if (prediction.predicted_price < prediction.current_price) {
+      direction = "DOWNWARD";
+      dirClass = "metric-negative";
+    }
   }
+
+  const formatPrice = (val) => `₹${val.toFixed(2)}`;
+  const formatDiff = (val) => `${val > 0 ? '+' : ''}₹${Math.abs(val).toFixed(2)}`;
+  const formatPct = (val) => `${val > 0 ? '+' : ''}${Math.abs(val).toFixed(2)}%`;
 
   return (
     <div className="app-container">
@@ -107,24 +122,18 @@ function StockPredictor() {
 
       <main className="main-content">
         <section className="hero-section">
-          <h2>Good evening.</h2>
-          <p>Your AI market intelligence is ready.</p>
+          <h2>AI Stock Intelligence</h2>
+          <p>Analyze the next market move with AI-powered prediction.</p>
         </section>
 
         <div className="glass-card">
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h3 style={{ fontFamily: 'var(--font-heading)', color: 'var(--primary-color)', letterSpacing: '0.1em', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-              AI Stock Prediction
-            </h3>
-          </div>
-
           <form onSubmit={handlePredict}>
             <div className="search-wrapper">
               <input
                 id="stock-symbol"
                 type="text"
                 className="premium-input"
-                placeholder="Enter a stock symbol (e.g. TCS.NS)"
+                placeholder="Stock Symbol (e.g. TCS.NS)"
                 value={symbol}
                 onChange={(e) => setSymbol(e.target.value)}
                 disabled={loading}
@@ -148,6 +157,7 @@ function StockPredictor() {
 
           {loading && (
             <div className="ai-loading-container">
+              <div style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.8rem', letterSpacing: '0.1em' }}>AI ANALYSIS IN PROGRESS</div>
               <div className="ai-scanline"></div>
               <div className="ai-step-text">
                 {loadingMessages[loadingStep]}
@@ -156,31 +166,56 @@ function StockPredictor() {
           )}
 
           {prediction && !loading && (
-            <div className="insight-card">
-              <div className="insight-header">
+            <div className="insight-card stagger-1">
+              <div className="insight-header stagger-2">
                 <div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>AI Market Insight</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>AI Prediction Result</div>
                   <div className="insight-symbol">{prediction.symbol}</div>
-                </div>
-                <div className={`insight-badge ${isBullish ? 'badge-bullish' : 'badge-bearish'}`}>
-                  {isBullish ? '▲ BULLISH' : '▼ BEARISH'} {Math.abs(percentageChange).toFixed(2)}%
                 </div>
               </div>
               
-              <div className="price-grid">
-                <div className="price-item">
+              {/* Premium AI Visualization connecting the prices */}
+              <div className="ai-connection-wrapper stagger-3">
+                <div className="ai-connection-line"></div>
+                
+                <div className="price-node-box">
                   <div className="price-label">Current Price</div>
-                  <div className="price-value">
-                    ₹{prediction.current_price.toFixed(2)}
+                  <div className="price-value" style={{ fontSize: '1.75rem' }}>
+                    {formatPrice(prediction.current_price)}
+                  </div>
+                </div>
+
+                <div className="ai-node">
+                  ✦ AI ✦
+                </div>
+
+                <div className="price-node-box">
+                  <div className="price-label">Predicted Price</div>
+                  <div className="price-value predicted" style={{ fontSize: '1.75rem' }}>
+                    {formatPrice(prediction.predicted_price)}
+                  </div>
+                </div>
+              </div>
+
+              {/* Derived Metrics Grid */}
+              <div className="derived-metrics-grid stagger-4">
+                <div className="metric-card">
+                  <div className="metric-label">Expected Price Change</div>
+                  <div className={`metric-value ${dirClass}`}>
+                    {formatDiff(difference)} <span style={{fontSize: '1rem', marginLeft: '0.25rem'}}>({formatPct(percentageChange)})</span>
                   </div>
                 </div>
                 
-                <div className="price-item">
-                  <div className="price-label">Predicted Price</div>
-                  <div className="price-value predicted">
-                    ₹{prediction.predicted_price.toFixed(2)}
+                <div className="metric-card stagger-5">
+                  <div className="metric-label">Expected Direction</div>
+                  <div className={`metric-value ${dirClass}`}>
+                    {direction}
                   </div>
                 </div>
+              </div>
+              
+              <div className="disclaimer-text stagger-6">
+                AI-generated prediction for informational purposes only. This is not financial advice.
               </div>
             </div>
           )}

@@ -632,3 +632,104 @@
   0% { left: -50%; }
   100% { left: 150%; }
 }
+
+/* ==========================================================================
+   MISSION 4 - STOCK PREDICTION AI VISUALS
+   ========================================================================== */
+.stagger-1 { animation: fadeUp 0.5s ease 0.1s both; }
+.stagger-2 { animation: fadeUp 0.5s ease 0.3s both; }
+.stagger-3 { animation: fadeUp 0.5s ease 0.5s both; }
+.stagger-4 { animation: fadeUp 0.5s ease 0.7s both; }
+.stagger-5 { animation: fadeUp 0.5s ease 0.9s both; }
+.stagger-6 { animation: fadeUp 0.5s ease 1.1s both; }
+
+.ai-connection-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 2.5rem 0;
+  position: relative;
+}
+
+.ai-connection-line {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+  z-index: 1;
+  animation: lineFlow 3s infinite linear;
+  background-size: 200% 100%;
+}
+
+.ai-node {
+  background: var(--bg-surface);
+  border: 1px solid var(--primary-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  z-index: 2;
+  color: var(--primary-color);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  box-shadow: 0 0 15px var(--primary-glow);
+  animation: pulse 2s infinite;
+}
+
+.price-node-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--card-border);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 2;
+  min-width: 140px;
+}
+
+.derived-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--card-border);
+  padding-top: 2rem;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.metric-label {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.metric-positive { color: var(--success-color); text-shadow: 0 0 10px var(--success-glow); }
+.metric-negative { color: var(--error-color); text-shadow: 0 0 10px var(--error-glow); }
+.metric-neutral { color: var(--text-muted); }
+
+.disclaimer-text {
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 2rem;
+}
+
+@keyframes lineFlow {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
