@@ -1,5 +1,7 @@
 import math
 
+from django.core.cache import cache
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,6 +9,10 @@ from rest_framework.permissions import IsAuthenticated
 
 from .predictor import predict_stock
 from .download_data import download_stock
+
+
+# Historical data will stay cached for 15 minutes
+HISTORY_CACHE_TIMEOUT = 15 * 60
 
 
 class StockPredictionView(APIView):
@@ -42,6 +48,21 @@ class StockHistoryView(APIView):
 
         symbol = symbol.strip().upper()
 
+        # Create a separate cache entry for each stock
+        cache_key = f"stock_history_{symbol}"
+
+        # Check cache first
+        cached_data = cache.get(cache_key)
+
+        if cached_data is not None:
+
+            print(f"Returning cached historical data for: {symbol}")
+
+            return Response(cached_data)
+
+        # Cache miss - download fresh data
+        print(f"Cache miss. Downloading historical data for: {symbol}")
+
         data = download_stock(symbol)
 
         if data is None or data.empty:
@@ -65,7 +86,6 @@ class StockHistoryView(APIView):
                 close = float(row["Close"])
                 volume = float(row["Volume"])
 
-                # Ignore rows containing NaN or Infinity
                 values = [
                     open_price,
                     high,
@@ -74,6 +94,7 @@ class StockHistoryView(APIView):
                     volume
                 ]
 
+                # Skip NaN or Infinity values
                 if not all(math.isfinite(value) for value in values):
                     continue
 
@@ -95,9 +116,20 @@ class StockHistoryView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        return Response({
+        response_data = {
             "symbol": symbol,
             "period": "1y",
             "interval": "1d",
             "data": historical_data
-        })
+        }
+
+        # Store successful result in cache
+        cache.set(
+            cache_key,
+            response_data,
+            HISTORY_CACHE_TIMEOUT
+        )
+
+        print(f"Historical data cached for: {symbol}")
+
+        return Response(response_data)
