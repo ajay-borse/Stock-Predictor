@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+import HistoricalChart from '../components/HistoricalChart';
 import '../App.css';
 
 function StockPredictor() {
@@ -220,6 +221,11 @@ function StockPredictor() {
             </div>
           )}
         </div>
+        
+        {/* Historical Analytics Section */}
+        {prediction && !loading && (
+          <HistoricalChart symbol={prediction.symbol} />
+        )}
       </main>
     </div>
   );
