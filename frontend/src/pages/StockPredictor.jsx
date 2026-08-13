@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../utils/api';
 import HistoricalChart from '../components/HistoricalChart';
+import Navbar from '../components/Navbar';
 import '../App.css';
 
 function StockPredictor() {
@@ -21,12 +22,19 @@ function StockPredictor() {
   ];
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    navigate('/login');
-  };
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [watchlistLoading, setWatchlistLoading] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.symbol) {
+      const sym = location.state.symbol;
+      setSymbol(sym);
+      executePrediction(sym);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     let interval;
@@ -42,10 +50,36 @@ function StockPredictor() {
     return () => clearInterval(interval);
   }, [loading]);
 
-  const handlePredict = async (e) => {
-    e.preventDefault(); 
-    
-    if (!symbol.trim()) {
+  const checkWatchlistStatus = async (sym) => {
+    try {
+      const res = await api.get('stocks/watchlist/');
+      const isSaved = res.data.some(s => s.symbol === sym);
+      setInWatchlist(isSaved);
+    } catch (err) {
+      console.error("Failed to check watchlist status", err);
+    }
+  };
+
+  const toggleWatchlist = async () => {
+    if (!prediction) return;
+    setWatchlistLoading(true);
+    try {
+      if (inWatchlist) {
+        await api.delete(`stocks/watchlist/?symbol=${prediction.symbol}`);
+        setInWatchlist(false);
+      } else {
+        await api.post('stocks/watchlist/', { symbol: prediction.symbol });
+        setInWatchlist(true);
+      }
+    } catch (err) {
+      console.error("Failed to update watchlist", err);
+    } finally {
+      setWatchlistLoading(false);
+    }
+  };
+
+  const executePrediction = async (sym) => {
+    if (!sym.trim()) {
       setError("Please enter a valid stock symbol.");
       return;
     }
@@ -56,9 +90,10 @@ function StockPredictor() {
 
     try {
       const response = await api.post('stocks/predict/', {
-        symbol: symbol.trim().toUpperCase()
+        symbol: sym.trim().toUpperCase()
       });
       setPrediction(response.data);
+      checkWatchlistStatus(response.data.symbol);
     } catch (err) {
       if (err.response && err.response.status === 401) {
         setError("Your session has expired. Please login again.");
@@ -71,6 +106,11 @@ function StockPredictor() {
       // Small artificial delay to allow animation to finish if API is too fast
       setTimeout(() => setLoading(false), 500);
     }
+  };
+
+  const handlePredict = async (e) => {
+    e?.preventDefault(); 
+    executePrediction(symbol);
   };
 
   // Derive metrics safely from the exact returned response
@@ -98,28 +138,7 @@ function StockPredictor() {
 
   return (
     <div className="app-container">
-      {/* Top Navigation */}
-      <nav className="navbar">
-        <div className="nav-brand">
-          <h1>StockMind AI</h1>
-          <div className="ai-status">
-            <div className="ai-status-dot"></div>
-            System Online
-          </div>
-        </div>
-        
-        <div className="nav-links">
-          <a href="#" className="active">Dashboard</a>
-          <a href="#">Prediction</a>
-          <a href="#">Portfolio</a>
-          <a href="#">Transactions</a>
-          <a href="#">Profile</a>
-        </div>
-
-        <button onClick={handleLogout} className="secondary-btn">
-          Logout
-        </button>
-      </nav>
+      <Navbar />
 
       <main className="main-content">
         <section className="hero-section">
@@ -173,6 +192,13 @@ function StockPredictor() {
                   <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>AI Prediction Result</div>
                   <div className="insight-symbol">{prediction.symbol}</div>
                 </div>
+                <button 
+                  onClick={toggleWatchlist} 
+                  disabled={watchlistLoading}
+                  className={`watchlist-btn ${inWatchlist ? 'active' : ''}`}
+                >
+                  {inWatchlist ? '★ In Watchlist' : '☆ Add to Watchlist'}
+                </button>
               </div>
               
               {/* Premium AI Visualization connecting the prices */}

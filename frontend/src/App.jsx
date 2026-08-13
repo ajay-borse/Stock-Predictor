@@ -3,6 +3,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import StockPredictor from './pages/StockPredictor';
+import Watchlist from './pages/Watchlist';
 import './App.css';
 
 function App() {
@@ -19,6 +20,14 @@ function App() {
           element={
             <ProtectedRoute>
               <StockPredictor />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/watchlist" 
+          element={
+            <ProtectedRoute>
+              <Watchlist />
             </ProtectedRoute>
           } 
         />

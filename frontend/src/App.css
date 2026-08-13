@@ -811,3 +811,219 @@
 .animate-fade-in {
   animation: fadeIn 0.8s ease both;
 }
+
+/* ==========================================================================
+   WATCHLIST SECTION
+   ========================================================================== */
+
+/* Add to Watchlist Button in Predictor */
+.watchlist-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.watchlist-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.watchlist-btn.active {
+  background: rgba(250, 204, 21, 0.1);
+  border-color: rgba(250, 204, 21, 0.3);
+  color: #facc15;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.2);
+}
+
+.watchlist-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Watchlist Layout */
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.watchlist-card {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.watchlist-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.6);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.watchlist-card-skeleton {
+  padding: 1.5rem;
+  min-height: 140px;
+}
+
+.card-header {
+  margin-bottom: 1.5rem;
+}
+
+.card-header h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  color: #facc15; /* Star color matching */
+}
+
+.tracked-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--card-border);
+  padding-top: 1rem;
+}
+
+.analyze-btn {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s ease;
+}
+
+.analyze-btn:hover {
+  color: #fff;
+}
+
+.remove-init-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.remove-init-btn:hover {
+  color: #fb7185;
+}
+
+/* Remove Confirmation */
+.remove-confirm {
+  border-top: 1px solid var(--card-border);
+  padding-top: 0.75rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.remove-confirm p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.remove-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.remove-actions button {
+  flex: 1;
+  padding: 0.4rem 0;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.confirm-btn {
+  background: rgba(251, 113, 133, 0.1);
+  color: #fb7185;
+  border-color: rgba(251, 113, 133, 0.3);
+}
+
+.confirm-btn:hover {
+  background: rgba(251, 113, 133, 0.2);
+}
+
+/* Notifications & States */
+.watchlist-notification {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.empty-state-card {
+  text-align: center;
+  padding: 4rem 2rem;
+  margin-top: 2rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state-card h3 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-state-card p {
+  color: var(--text-muted);
+  margin: 0 0 2rem 0;
+}
+
+.error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 4px solid var(--error-color);
+  color: var(--error-color);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
