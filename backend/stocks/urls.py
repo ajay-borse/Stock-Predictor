@@ -3,25 +3,56 @@ from django.urls import path
 from .views import (
     StockPredictionView,
     StockHistoryView,
-    WatchlistView
+    WatchlistView,
+    BuyStockView,
+    SellStockView,
+    PortfolioView,
+    TransactionHistoryView
 )
 
 
 urlpatterns = [
 
+    # Stock prediction
     path(
         "predict/",
         StockPredictionView.as_view()
     ),
 
+    # Historical stock data
     path(
         "history/",
         StockHistoryView.as_view()
     ),
 
+    # Watchlist
     path(
         "watchlist/",
         WatchlistView.as_view()
+    ),
+
+    # Buy stock
+    path(
+        "buy/",
+        BuyStockView.as_view()
+    ),
+
+    # Sell stock
+    path(
+        "sell/",
+        SellStockView.as_view()
+    ),
+
+    # Portfolio / holdings
+    path(
+        "portfolio/",
+        PortfolioView.as_view()
+    ),
+
+    # Transaction history
+    path(
+        "transactions/",
+        TransactionHistoryView.as_view()
     ),
 
 ]
