@@ -7,7 +7,7 @@ from .views import (
     BuyStockView,
     SellStockView,
     PortfolioView,
-    TransactionHistoryView,
+    TransactionListView,
     PortfolioAnalyticsView
 )
 
@@ -59,7 +59,7 @@ urlpatterns = [
     # Transaction history
     path(
         "transactions/",
-        TransactionHistoryView.as_view()
+        TransactionListView.as_view()
     ),
 
 ]

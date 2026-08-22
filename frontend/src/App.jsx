@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import StockPredictor from './pages/StockPredictor';
 import Watchlist from './pages/Watchlist';
 import Portfolio from './pages/Portfolio';
+import Transactions from './pages/Transactions';
 import './App.css';
 
 function App() {
@@ -37,6 +38,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Portfolio />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/transactions" 
+          element={
+            <ProtectedRoute>
+              <Transactions />
             </ProtectedRoute>
           } 
         />

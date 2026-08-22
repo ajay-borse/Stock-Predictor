@@ -1834,3 +1834,181 @@
   .performers-grid { grid-template-columns: 1fr; }
   .holding-metrics-grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   MISSION 10 - TRANSACTIONS DASHBOARD
+   ========================================================================== */
+
+.transactions-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.transactions-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--card-border);
+  padding-bottom: 1rem;
+}
+
+.tx-filter-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.05em;
+}
+
+.tx-filter-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tx-filter-btn.active {
+  background: rgba(0, 242, 254, 0.1);
+  color: var(--primary-color);
+  border-color: rgba(0, 242, 254, 0.3);
+  box-shadow: 0 0 10px rgba(0, 242, 254, 0.2);
+}
+
+.transactions-table-wrapper {
+  overflow-x: auto;
+  padding: 0;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th {
+  text-align: left;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.transactions-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  vertical-align: middle;
+}
+
+.transactions-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tx-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.tx-buy {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.tx-sell {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error-color);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.tx-symbol {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.tx-status-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--success-color);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.transactions-mobile-list {
+  display: none;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tx-mobile-card {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tx-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.75rem;
+}
+
+.tx-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tx-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.tx-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tx-detail .lbl {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.tx-detail .val {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.tx-card-footer {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+  padding-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .transactions-table-wrapper { display: none; }
+  .transactions-mobile-list { display: flex; }
+  .transactions-summary-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .transactions-filters { overflow-x: auto; white-space: nowrap; padding-bottom: 0.5rem; }
+}

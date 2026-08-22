@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from .predictor import predict_stock
 from .download_data import download_stock
 from .models import Watchlist, Holding, Transaction
+from .serializers import TransactionSerializer
 
 
 # ============================================================
@@ -648,43 +649,21 @@ class PortfolioView(APIView):
 
 
 # ============================================================
-# TRANSACTION HISTORY
+# TRANSACTION LIST
 # ============================================================
 
-class TransactionHistoryView(APIView):
+class TransactionListView(APIView):
 
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-
-        transactions = Transaction.objects.filter(
-            user=request.user
-        )
-
-        data = []
-
-        for transaction in transactions:
-
-            data.append(
-                {
-                    "id": transaction.id,
-                    "symbol": transaction.symbol,
-                    "type":
-                    transaction.transaction_type,
-                    "quantity":
-                    transaction.quantity,
-                    "price":
-                    float(transaction.price),
-                    "total_amount":
-                    float(
-                        transaction.total_amount
-                    ),
-                    "created_at":
-                    transaction.created_at
-                }
-            )
-
-        return Response(data)
+        transactions = Transaction.objects.filter(user=request.user).order_by('-created_at')
+        
+        if not transactions.exists():
+            return Response([])
+            
+        serializer = TransactionSerializer(transactions, many=True)
+        return Response(serializer.data)
 
 
 # ============================================================

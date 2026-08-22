@@ -65,11 +65,6 @@ const Portfolio = () => {
     navigate('/', { state: { symbol } });
   };
 
-  const scrollToTransactions = () => {
-    const el = document.getElementById('transactions-section');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
-
   const formatCurrency = (val) => {
     if (val === undefined || val === null) return '₹0.00';
     return `₹${val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -303,41 +298,9 @@ const Portfolio = () => {
                 <button className="action-card-btn" onClick={() => navigate('/')}>+ Buy Stock</button>
                 <button className="action-card-btn" onClick={() => navigate('/watchlist')}>View Watchlist</button>
                 <button className="action-card-btn" onClick={() => navigate('/')}>AI Prediction</button>
-                <button className="action-card-btn" onClick={scrollToTransactions}>Transactions</button>
+                <button className="action-card-btn" onClick={() => navigate('/transactions')}>Transactions</button>
               </div>
             </div>
-
-            {/* TRANSACTIONS - Kept backward compatible */}
-            <section className="portfolio-section animate-fade-in stagger-6" id="transactions-section" style={{ marginTop: '3rem' }}>
-              <h3>Transaction History</h3>
-              {!transactions || transactions.length === 0 ? (
-                <div className="empty-state glass-card" style={{ padding: '2rem', textAlign: 'center' }}>
-                  <h4 style={{ margin: '0 0 0.5rem 0', color: '#fff' }}>No transactions yet.</h4>
-                  <p style={{ margin: 0, color: 'var(--text-muted)' }}>Your buy and sell activity will appear here.</p>
-                </div>
-              ) : (
-                <div className="transactions-list glass-card" style={{ padding: '1.5rem', overflowX: 'auto' }}>
-                  <div className="transaction-header-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', gap: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--card-border)', marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase' }}>
-                    <span>Date</span>
-                    <span>Stock</span>
-                    <span>Type</span>
-                    <span>Quantity</span>
-                    <span>Price</span>
-                    <span>Total</span>
-                  </div>
-                  {transactions.map((tx) => (
-                    <div key={tx.id} className="transaction-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', gap: '1rem', padding: '0.75rem 0', borderBottom: '1px solid rgba(255,255,255,0.02)', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.9rem' }}>{new Date(tx.created_at).toLocaleDateString()}</span>
-                      <span className="tx-symbol" style={{ fontWeight: 600, color: '#fff' }}>{tx.symbol}</span>
-                      <span className={`tx-type ${tx.type.toLowerCase()}`} style={{ color: tx.type.toLowerCase() === 'buy' ? 'var(--success-color)' : 'var(--error-color)', fontSize: '0.9rem', fontWeight: 500 }}>{tx.type}</span>
-                      <span style={{ fontSize: '0.9rem' }}>{tx.quantity}</span>
-                      <span style={{ fontSize: '0.9rem' }}>{formatCurrency(tx.price)}</span>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{formatCurrency(tx.total_amount)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
           </>
         )}
       </main>
