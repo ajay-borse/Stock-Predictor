@@ -141,6 +141,39 @@ function StockPredictor() {
   const formatDiff = (val) => `${val > 0 ? '+' : ''}₹${Math.abs(val).toFixed(2)}`;
   const formatPct = (val) => `${val > 0 ? '+' : ''}${Math.abs(val).toFixed(2)}%`;
 
+  let movementClass = "movement-small";
+  let movementText = "Very small";
+  const absPct = Math.abs(percentageChange);
+  if (absPct > 3) {
+    movementClass = "movement-large";
+    movementText = "Larger";
+  } else if (absPct >= 1) {
+    movementClass = "movement-moderate";
+    movementText = "Moderate";
+  }
+
+  let aiExpects = "";
+  let aiComparison = "";
+  let modelInterp = "";
+  let directionIcon = "";
+
+  if (direction === "UPWARD") {
+    aiExpects = "AI expects a potential upward movement based on the current prediction.";
+    aiComparison = "The predicted price is higher than the current market price.";
+    modelInterp = "Based on the model prediction, the expected price is slightly above the current price, indicating a potential upward movement.";
+    directionIcon = "↑";
+  } else if (direction === "DOWNWARD") {
+    aiExpects = "AI expects a potential downward movement based on the current prediction.";
+    aiComparison = "The predicted price is lower than the current market price.";
+    modelInterp = "Based on the model prediction, the expected price is slightly below the current price, indicating a potential downward movement.";
+    directionIcon = "↓";
+  } else {
+    aiExpects = "AI expects limited price movement.";
+    aiComparison = "The predicted price is approximately equal to the current market price.";
+    modelInterp = "The model prediction is close to the current price, indicating limited expected movement.";
+    directionIcon = "→";
+  }
+
   return (
     <div className="app-container">
       <Navbar />
@@ -197,22 +230,18 @@ function StockPredictor() {
 
           {loading && (
             <div className="ai-loading-container animate-fade-in" style={{ margin: '2rem 0', textAlign: 'center' }}>
-              <div className="ai-scanline"></div>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-                <div style={{ width: '40px', height: '40px', border: '3px solid rgba(6, 182, 212, 0.2)', borderTopColor: '#06b6d4', borderRadius: '50%', animation: 'spinRing 1s linear infinite' }}></div>
-                <div className="ai-step-text" style={{ fontSize: '1rem' }}>
-                  {loadingMessages[0]}
-                </div>
-              </div>
+              <div className="skeleton-box" style={{ height: '30px', width: '200px', margin: '0 auto 1rem auto' }}></div>
+              <div className="skeleton-box" style={{ height: '20px', width: '150px', margin: '0 auto 2rem auto' }}></div>
+              <div className="skeleton-box" style={{ height: '300px', width: '100%' }}></div>
             </div>
           )}
 
           {prediction && !loading && (
-            <div className="insight-card stagger-1">
-              <div className="insight-header stagger-2">
-                <div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem' }}>AI Prediction Result</div>
-                  <div className="insight-symbol">{prediction.symbol}</div>
+            <div className="ai-insight-card animate-fade-in stagger-1">
+              <div className="ai-insight-header stagger-2">
+                <div style={{ flex: 1 }}>
+                  <div className="ai-insight-title">✦ AI INSIGHT</div>
+                  <div className="ai-insight-subtitle">Understanding the model's prediction</div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
@@ -227,52 +256,56 @@ function StockPredictor() {
                     onClick={() => openBuyModal(prediction.symbol)}
                     style={{ padding: '0.5rem 1rem', fontSize: '0.9rem' }}
                   >
-                    Buy Stock
+                    Buy
                   </button>
                 </div>
               </div>
-              
-              {/* Premium AI Visualization connecting the prices */}
-              <div className="ai-connection-wrapper stagger-3">
-                <div className="ai-connection-line"></div>
-                
-                <div className="price-node-box">
-                  <div className="price-label">Current Price</div>
-                  <div className="price-value" style={{ fontSize: '1.75rem' }}>
-                    {formatPrice(prediction.current_price)}
+
+              <div className="ai-insight-grid stagger-3">
+                <div>
+                  <div className="insight-section-title">EXPECTED DIRECTION</div>
+                  <div className={`insight-direction-badge direction-${direction.toLowerCase()}`}>
+                    {directionIcon} {direction}
                   </div>
                 </div>
-
-                <div className="ai-node">
-                  ✦ AI ✦
+                <div>
+                  <div className="insight-section-title">EXPECTED MOVEMENT</div>
+                  <div className={`insight-movement ${dirClass}`}>
+                    {formatDiff(difference)} <span style={{fontSize: '1rem', marginLeft: '0.25rem'}}>({formatPct(percentageChange)})</span>
+                  </div>
                 </div>
+              </div>
 
-                <div className="price-node-box">
-                  <div className="price-label">Predicted Price</div>
-                  <div className="price-value predicted" style={{ fontSize: '1.75rem' }}>
+              <div className="ai-flow-visualization stagger-4">
+                <div className="flow-node">
+                  <div className="flow-label">CURRENT PRICE</div>
+                  <div className="flow-price">{formatPrice(prediction.current_price)}</div>
+                </div>
+                <div className="flow-arrow">
+                  <div>AI</div>
+                  <div className="flow-line"></div>
+                </div>
+                <div className="flow-node">
+                  <div className="flow-label">PREDICTED PRICE</div>
+                  <div className="flow-price" style={{ color: direction === 'UPWARD' ? 'var(--success-color)' : direction === 'DOWNWARD' ? 'var(--error-color)' : '#fff', borderColor: direction === 'UPWARD' ? 'rgba(16, 185, 129, 0.3)' : direction === 'DOWNWARD' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)' }}>
                     {formatPrice(prediction.predicted_price)}
                   </div>
                 </div>
               </div>
 
-              {/* Derived Metrics Grid */}
-              <div className="derived-metrics-grid stagger-4">
-                <div className="metric-card">
-                  <div className="metric-label">Expected Price Change</div>
-                  <div className={`metric-value ${dirClass}`}>
-                    {formatDiff(difference)} <span style={{fontSize: '1rem', marginLeft: '0.25rem'}}>({formatPct(percentageChange)})</span>
-                  </div>
-                </div>
-                
-                <div className="metric-card stagger-5">
-                  <div className="metric-label">Expected Direction</div>
-                  <div className={`metric-value ${dirClass}`}>
-                    {direction}
-                  </div>
+              <div className="stagger-5">
+                <div className="insight-section-title">MODEL INTERPRETATION</div>
+                <div className="insight-interpretation">
+                  <p style={{ marginBottom: '0.5rem' }}>{aiExpects}</p>
+                  <p style={{ marginBottom: '1rem' }}>{aiComparison}</p>
+                  <p style={{ marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }}>{modelInterp}</p>
+                  <p style={{ fontWeight: 600, color: 'var(--text-main)' }}>
+                    Expected movement: <span className={movementClass}>{movementText}</span>
+                  </p>
                 </div>
               </div>
-              
-              <div className="disclaimer-text stagger-6">
+
+              <div className="insight-disclaimer stagger-6">
                 AI-generated prediction for informational purposes only. This is not financial advice.
               </div>
             </div>
