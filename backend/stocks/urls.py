@@ -10,11 +10,23 @@ from .views import (
     SellStockView,
     PortfolioView,
     TransactionListView,
-    PortfolioAnalyticsView
+    PortfolioAnalyticsView,
+    NotificationListView,
+    MarkAllNotificationsReadView
 )
 
 
 urlpatterns = [
+    # Notifications
+    path(
+        "notifications/",
+        NotificationListView.as_view()
+    ),
+    path(
+        "notifications/read-all/",
+        MarkAllNotificationsReadView.as_view()
+    ),
+
     # Stock Search
     path(
         "search/",

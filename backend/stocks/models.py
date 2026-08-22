@@ -108,3 +108,42 @@ class Transaction(models.Model):
             f"{self.transaction_type} - "
             f"{self.symbol}"
         )
+
+class Notification(models.Model):
+    WATCHLIST = "WATCHLIST"
+    BUY = "BUY"
+    SELL = "SELL"
+    PREDICTION = "PREDICTION"
+    SYSTEM = "SYSTEM"
+
+    NOTIFICATION_TYPES = [
+        (WATCHLIST, "Watchlist"),
+        (BUY, "Buy"),
+        (SELL, "Sell"),
+        (PREDICTION, "Prediction"),
+        (SYSTEM, "System"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notifications"
+    )
+
+    message = models.CharField(max_length=255)
+
+    notification_type = models.CharField(
+        max_length=20,
+        choices=NOTIFICATION_TYPES,
+        default=SYSTEM
+    )
+
+    is_read = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.notification_type} - {self.is_read}"

@@ -26,6 +26,7 @@ HISTORY_CACHE_TIMEOUT = 15 * 60
 # ============================================================
 
 class StockPredictionView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
@@ -41,6 +42,8 @@ class StockPredictionView(APIView):
 
         result = predict_stock(symbol)
 
+        if "error" not in result:
+            Notification.objects.create(user=request.user, message=f"AI prediction ready for {symbol}.", notification_type=Notification.PREDICTION)
         return Response(result)
 
 
@@ -1126,3 +1129,29 @@ class StockSearchView(APIView):
         cache.set(cache_key, final_list, 86400)
         return Response(final_list)
 
+
+# ============================================================
+# NOTIFICATIONS
+# ============================================================
+
+from .models import Notification
+from .serializers import NotificationSerializer
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        notifications = Notification.objects.filter(user=request.user)
+        unread_count = notifications.filter(is_read=False).count()
+        serializer = NotificationSerializer(notifications[:50], many=True)
+        return Response({
+            "notifications": serializer.data,
+            "unread_count": unread_count
+        })
+
+class MarkAllNotificationsReadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
+        return Response({"status": "success"})
