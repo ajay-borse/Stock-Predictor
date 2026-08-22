@@ -13,7 +13,10 @@ from .download_data import download_stock
 from .models import Watchlist, Holding, Transaction
 
 
-# Historical data cache: 15 minutes
+# ============================================================
+# CACHE
+# ============================================================
+
 HISTORY_CACHE_TIMEOUT = 15 * 60
 
 
@@ -60,10 +63,8 @@ class StockHistoryView(APIView):
 
         symbol = symbol.strip().upper()
 
-        # Cache key for each stock
         cache_key = f"stock_history_{symbol}"
 
-        # Check cache first
         cached_data = cache.get(cache_key)
 
         if cached_data is not None:
@@ -74,7 +75,6 @@ class StockHistoryView(APIView):
 
             return Response(cached_data)
 
-        # Cache miss - download fresh data
         print(
             f"Cache miss. Downloading historical data for: {symbol}"
         )
@@ -82,9 +82,11 @@ class StockHistoryView(APIView):
         data = download_stock(symbol)
 
         if data is None or data.empty:
+
             return Response(
                 {
-                    "error": f"No historical data found for {symbol}"
+                    "error":
+                    f"No historical data found for {symbol}"
                 },
                 status=status.HTTP_404_NOT_FOUND
             )
@@ -116,7 +118,6 @@ class StockHistoryView(APIView):
                     volume
                 ]
 
-                # Skip NaN and Infinity values
                 if not all(
                     math.isfinite(value)
                     for value in values
@@ -142,6 +143,7 @@ class StockHistoryView(APIView):
                 continue
 
         if not historical_data:
+
             return Response(
                 {
                     "error":
@@ -157,7 +159,6 @@ class StockHistoryView(APIView):
             "data": historical_data
         }
 
-        # Store successful result in cache
         cache.set(
             cache_key,
             response_data,
@@ -204,9 +205,11 @@ class WatchlistView(APIView):
         symbol = request.data.get("symbol")
 
         if not symbol:
+
             return Response(
                 {
-                    "error": "Stock symbol is required"
+                    "error":
+                    "Stock symbol is required"
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -244,9 +247,11 @@ class WatchlistView(APIView):
         symbol = request.query_params.get("symbol")
 
         if not symbol:
+
             return Response(
                 {
-                    "error": "Stock symbol is required"
+                    "error":
+                    "Stock symbol is required"
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -291,49 +296,70 @@ class BuyStockView(APIView):
         quantity = request.data.get("quantity")
         price = request.data.get("price")
 
-        # Validate symbol
         if not symbol:
+
             return Response(
-                {"error": "Stock symbol is required"},
+                {
+                    "error":
+                    "Stock symbol is required"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Validate quantity
         try:
             quantity = int(quantity)
+
         except (TypeError, ValueError):
+
             return Response(
-                {"error": "Quantity must be a valid integer"},
+                {
+                    "error":
+                    "Quantity must be a valid integer"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if quantity <= 0:
+
             return Response(
-                {"error": "Quantity must be greater than 0"},
+                {
+                    "error":
+                    "Quantity must be greater than 0"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Validate price
         try:
             price = Decimal(str(price))
-        except (InvalidOperation, TypeError, ValueError):
+
+        except (
+            InvalidOperation,
+            TypeError,
+            ValueError
+        ):
+
             return Response(
-                {"error": "Price must be a valid number"},
+                {
+                    "error":
+                    "Price must be a valid number"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if price <= 0:
+
             return Response(
-                {"error": "Price must be greater than 0"},
+                {
+                    "error":
+                    "Price must be greater than 0"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         symbol = symbol.strip().upper()
 
-        # Calculate total amount
         total_amount = price * quantity
 
-        # Find or create holding
         holding, created = Holding.objects.get_or_create(
             user=request.user,
             symbol=symbol,
@@ -350,22 +376,23 @@ class BuyStockView(APIView):
 
             new_quantity = old_quantity + quantity
 
-            # Weighted average buy price
             new_average_price = (
                 (
-                    Decimal(old_quantity) * old_average_price
+                    Decimal(old_quantity)
+                    * old_average_price
                 )
                 +
                 (
-                    Decimal(quantity) * price
+                    Decimal(quantity)
+                    * price
                 )
             ) / Decimal(new_quantity)
 
             holding.quantity = new_quantity
             holding.average_buy_price = new_average_price
+
             holding.save()
 
-        # Record transaction
         transaction = Transaction.objects.create(
             user=request.user,
             symbol=symbol,
@@ -377,22 +404,26 @@ class BuyStockView(APIView):
 
         return Response(
             {
-                "message": f"{symbol} purchased successfully.",
+                "message":
+                f"{symbol} purchased successfully.",
+
                 "transaction": {
                     "id": transaction.id,
                     "symbol": transaction.symbol,
                     "type": transaction.transaction_type,
                     "quantity": transaction.quantity,
                     "price": float(transaction.price),
-                    "total_amount": float(
-                        transaction.total_amount
-                    ),
-                    "created_at": transaction.created_at
+                    "total_amount":
+                    float(transaction.total_amount),
+                    "created_at":
+                    transaction.created_at
                 },
+
                 "holding": {
                     "symbol": holding.symbol,
                     "quantity": holding.quantity,
-                    "average_buy_price": float(
+                    "average_buy_price":
+                    float(
                         holding.average_buy_price
                     )
                 }
@@ -415,52 +446,77 @@ class SellStockView(APIView):
         quantity = request.data.get("quantity")
         price = request.data.get("price")
 
-        # Validate symbol
         if not symbol:
+
             return Response(
-                {"error": "Stock symbol is required"},
+                {
+                    "error":
+                    "Stock symbol is required"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         symbol = symbol.strip().upper()
 
-        # Validate quantity
         try:
             quantity = int(quantity)
+
         except (TypeError, ValueError):
+
             return Response(
-                {"error": "Quantity must be a valid integer"},
+                {
+                    "error":
+                    "Quantity must be a valid integer"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if quantity <= 0:
+
             return Response(
-                {"error": "Quantity must be greater than 0"},
+                {
+                    "error":
+                    "Quantity must be greater than 0"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Validate price
         try:
             price = Decimal(str(price))
-        except (InvalidOperation, TypeError, ValueError):
+
+        except (
+            InvalidOperation,
+            TypeError,
+            ValueError
+        ):
+
             return Response(
-                {"error": "Price must be a valid number"},
+                {
+                    "error":
+                    "Price must be a valid number"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if price <= 0:
+
             return Response(
-                {"error": "Price must be greater than 0"},
+                {
+                    "error":
+                    "Price must be greater than 0"
+                },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Find holding
         try:
+
             holding = Holding.objects.get(
                 user=request.user,
                 symbol=symbol
             )
+
         except Holding.DoesNotExist:
+
             return Response(
                 {
                     "error":
@@ -469,26 +525,22 @@ class SellStockView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Prevent selling more than owned
         if quantity > holding.quantity:
+
             return Response(
                 {
                     "error":
-                    f"You only own {holding.quantity} shares "
-                    f"of {symbol}."
+                    f"You only own {holding.quantity} "
+                    f"shares of {symbol}."
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Calculate total sale amount
         total_amount = price * quantity
 
-        # Update holding
         holding.quantity -= quantity
 
-        remaining_quantity = holding.quantity
-
-        if remaining_quantity == 0:
+        if holding.quantity == 0:
 
             holding.delete()
 
@@ -501,12 +553,12 @@ class SellStockView(APIView):
             holding_response = {
                 "symbol": holding.symbol,
                 "quantity": holding.quantity,
-                "average_buy_price": float(
+                "average_buy_price":
+                float(
                     holding.average_buy_price
                 )
             }
 
-        # Record transaction
         transaction = Transaction.objects.create(
             user=request.user,
             symbol=symbol,
@@ -518,18 +570,21 @@ class SellStockView(APIView):
 
         return Response(
             {
-                "message": f"{symbol} sold successfully.",
+                "message":
+                f"{symbol} sold successfully.",
+
                 "transaction": {
                     "id": transaction.id,
                     "symbol": transaction.symbol,
                     "type": transaction.transaction_type,
                     "quantity": transaction.quantity,
                     "price": float(transaction.price),
-                    "total_amount": float(
-                        transaction.total_amount
-                    ),
-                    "created_at": transaction.created_at
+                    "total_amount":
+                    float(transaction.total_amount),
+                    "created_at":
+                    transaction.created_at
                 },
+
                 "holding": holding_response
             },
             status=status.HTTP_200_OK
@@ -537,7 +592,7 @@ class SellStockView(APIView):
 
 
 # ============================================================
-# PORTFOLIO / HOLDINGS
+# PORTFOLIO
 # ============================================================
 
 class PortfolioView(APIView):
@@ -568,22 +623,26 @@ class PortfolioView(APIView):
                     "id": holding.id,
                     "symbol": holding.symbol,
                     "quantity": holding.quantity,
-                    "average_buy_price": float(
+                    "average_buy_price":
+                    float(
                         holding.average_buy_price
                     ),
-                    "invested_amount": float(
-                        invested_amount
-                    ),
-                    "created_at": holding.created_at,
-                    "updated_at": holding.updated_at
+                    "invested_amount":
+                    float(invested_amount),
+                    "created_at":
+                    holding.created_at,
+                    "updated_at":
+                    holding.updated_at
                 }
             )
 
         return Response(
             {
                 "holdings": data,
-                "total_invested": float(total_invested),
-                "number_of_holdings": len(data)
+                "total_invested":
+                float(total_invested),
+                "number_of_holdings":
+                len(data)
             }
         )
 
@@ -610,14 +669,250 @@ class TransactionHistoryView(APIView):
                 {
                     "id": transaction.id,
                     "symbol": transaction.symbol,
-                    "type": transaction.transaction_type,
-                    "quantity": transaction.quantity,
-                    "price": float(transaction.price),
-                    "total_amount": float(
+                    "type":
+                    transaction.transaction_type,
+                    "quantity":
+                    transaction.quantity,
+                    "price":
+                    float(transaction.price),
+                    "total_amount":
+                    float(
                         transaction.total_amount
                     ),
-                    "created_at": transaction.created_at
+                    "created_at":
+                    transaction.created_at
                 }
             )
 
         return Response(data)
+
+
+# ============================================================
+# PORTFOLIO ANALYTICS
+# ============================================================
+
+class PortfolioAnalyticsView(APIView):
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        holdings = Holding.objects.filter(
+            user=request.user
+        )
+
+        if not holdings.exists():
+
+            return Response(
+                {
+                    "message":
+                    "Your portfolio is empty.",
+                    "total_invested": 0,
+                    "current_value": 0,
+                    "total_profit_loss": 0,
+                    "profit_loss_percentage": 0,
+                    "holdings": []
+                }
+            )
+
+        analytics = []
+
+        total_invested = Decimal("0")
+        total_current_value = Decimal("0")
+
+        best_performer = None
+        worst_performer = None
+
+        for holding in holdings:
+
+            symbol = holding.symbol
+            quantity = holding.quantity
+            average_buy_price = (
+                holding.average_buy_price
+            )
+
+            invested_amount = (
+                Decimal(quantity)
+                * average_buy_price
+            )
+
+            total_invested += invested_amount
+
+            # ------------------------------------------------
+            # Download latest market data
+            # ------------------------------------------------
+
+            try:
+
+                data = download_stock(symbol)
+
+                if data is None or data.empty:
+
+                    continue
+
+                # Handle MultiIndex
+                if (
+                    hasattr(data.columns, "nlevels")
+                    and data.columns.nlevels > 1
+                ):
+                    data.columns = (
+                        data.columns
+                        .get_level_values(0)
+                    )
+
+                latest_close = float(
+                    data["Close"].iloc[-1]
+                )
+
+                if not math.isfinite(
+                    latest_close
+                ):
+                    continue
+
+                current_price = Decimal(
+                    str(latest_close)
+                )
+
+            except (
+                TypeError,
+                ValueError,
+                KeyError,
+                IndexError
+            ):
+
+                continue
+
+            # ------------------------------------------------
+            # Calculate values
+            # ------------------------------------------------
+
+            current_value = (
+                Decimal(quantity)
+                * current_price
+            )
+
+            profit_loss = (
+                current_value
+                - invested_amount
+            )
+
+            if invested_amount > 0:
+
+                profit_loss_percentage = (
+                    profit_loss
+                    / invested_amount
+                ) * Decimal("100")
+
+            else:
+
+                profit_loss_percentage = Decimal("0")
+
+            total_current_value += current_value
+
+            holding_data = {
+                "id": holding.id,
+                "symbol": symbol,
+                "quantity": quantity,
+
+                "average_buy_price":
+                float(average_buy_price),
+
+                "current_price":
+                float(current_price),
+
+                "invested_amount":
+                float(invested_amount),
+
+                "current_value":
+                float(current_value),
+
+                "profit_loss":
+                float(profit_loss),
+
+                "profit_loss_percentage":
+                float(
+                    profit_loss_percentage
+                )
+            }
+
+            analytics.append(
+                holding_data
+            )
+
+            # ------------------------------------------------
+            # Best performer
+            # ------------------------------------------------
+
+            if (
+                best_performer is None
+                or profit_loss_percentage
+                > best_performer[
+                    "profit_loss_percentage"
+                ]
+            ):
+
+                best_performer = holding_data
+
+            # ------------------------------------------------
+            # Worst performer
+            # ------------------------------------------------
+
+            if (
+                worst_performer is None
+                or profit_loss_percentage
+                < worst_performer[
+                    "profit_loss_percentage"
+                ]
+            ):
+
+                worst_performer = holding_data
+
+        # ----------------------------------------------------
+        # Overall portfolio P/L
+        # ----------------------------------------------------
+
+        total_profit_loss = (
+            total_current_value
+            - total_invested
+        )
+
+        if total_invested > 0:
+
+            total_profit_loss_percentage = (
+                total_profit_loss
+                / total_invested
+            ) * Decimal("100")
+
+        else:
+
+            total_profit_loss_percentage = Decimal("0")
+
+        return Response(
+            {
+                "total_invested":
+                float(total_invested),
+
+                "current_value":
+                float(total_current_value),
+
+                "total_profit_loss":
+                float(total_profit_loss),
+
+                "profit_loss_percentage":
+                float(
+                    total_profit_loss_percentage
+                ),
+
+                "number_of_holdings":
+                len(analytics),
+
+                "best_performer":
+                best_performer,
+
+                "worst_performer":
+                worst_performer,
+
+                "holdings":
+                analytics
+            }
+        )
