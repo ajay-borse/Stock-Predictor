@@ -94,11 +94,12 @@ function Profile() {
 
                 {!loading && error && (
                     <div
-                        className="glass-card"
+                        className="glass-card error-state-card animate-fade-in"
                         style={{
                             textAlign: 'center',
                             padding: '4rem 2rem',
-                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            border: '1px solid var(--error-color)',
+                            background: 'var(--error-glow)',
                         }}
                     >
                         <div
@@ -118,6 +119,8 @@ function Profile() {
                             style={{
                                 marginTop: '1.5rem',
                                 maxWidth: '200px',
+                                background: 'var(--error-color)',
+                                color: '#fff'
                             }}
                         >
                             Try Again
@@ -136,6 +139,7 @@ function Profile() {
                                 textAlign: 'center',
                                 padding: '3rem 2rem',
                                 marginBottom: '1.5rem',
+                                background: 'var(--bg-surface)'
                             }}
                         >
                             <div
@@ -150,10 +154,7 @@ function Profile() {
                                     fontSize: '2rem',
                                     fontWeight: '700',
                                     color: '#fff',
-                                    background:
-                                        'linear-gradient(135deg, #06b6d4, #3b82f6)',
-                                    boxShadow:
-                                        '0 0 30px rgba(6, 182, 212, 0.3)',
+                                    background: 'var(--primary-color)',
                                 }}
                             >
                                 {getInitials()}
@@ -188,6 +189,7 @@ function Profile() {
                             className="glass-card"
                             style={{
                                 padding: '2rem',
+                                background: 'var(--bg-surface)'
                             }}
                         >
                             <h3 style={{ marginBottom: '1.5rem' }}>
@@ -203,65 +205,59 @@ function Profile() {
                                 }}
                             >
 
-                                <div className="glass-card">
-                                    <span className="label">Username</span>
-                                    <div className="value">
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Username</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                                         {user.username || 'Not available'}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">Email</span>
-                                    <div className="value">
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Email</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                                         {user.email || 'Not available'}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">First Name</span>
-                                    <div className="value">
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>First Name</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                                         {user.first_name || 'Not available'}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">Last Name</span>
-                                    <div className="value">
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Last Name</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                                         {user.last_name || 'Not available'}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">Phone</span>
-                                    <div className="value">
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Phone</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
                                         {user.phone || user.phone_number || 'Not available'}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">Date of Birth</span>
-                                    <div className="value">
-                                        {formatDate(
-                                            user.date_of_birth
-                                        )}
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Date of Birth</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
+                                        {formatDate(user.date_of_birth)}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">Member Since</span>
-                                    <div className="value">
-                                        {formatDate(
-                                            user.date_joined
-                                        )}
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Member Since</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
+                                        {formatDate(user.date_joined)}
                                     </div>
                                 </div>
 
-                                <div className="glass-card">
-                                    <span className="label">Last Login</span>
-                                    <div className="value">
-                                        {formatDate(
-                                            user.last_login
-                                        )}
+                                <div className="glass-card" style={{ background: 'var(--bg-app)', border: '1px solid var(--card-border)' }}>
+                                    <span className="label" style={{ color: 'var(--text-muted)' }}>Last Login</span>
+                                    <div className="value" style={{ fontWeight: 600, color: 'var(--text-main)', marginTop: '0.25rem' }}>
+                                        {formatDate(user.last_login)}
                                     </div>
                                 </div>
 

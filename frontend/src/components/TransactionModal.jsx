@@ -123,16 +123,16 @@ const TransactionModal = ({ isOpen, type, symbol, availableShares, onClose, onSu
           <div className="input-group">
             <label>Current Market Price</label>
             {priceLoading ? (
-               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', color: 'var(--text-muted)' }}>
-                 <div style={{ width: '16px', height: '16px', border: '2px solid rgba(6, 182, 212, 0.2)', borderTopColor: '#06b6d4', borderRadius: '50%', animation: 'spinRing 1s linear infinite' }}></div>
+               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', background: 'var(--bg-surface)', borderRadius: '8px', color: 'var(--text-muted)' }}>
+                 <div style={{ width: '16px', height: '16px', border: '2px solid var(--card-border)', borderTopColor: 'var(--primary-color)', borderRadius: '50%', animation: 'spinRing 1s linear infinite' }}></div>
                  <span>Fetching current market price...</span>
                </div>
             ) : priceError ? (
-               <div style={{ padding: '0.75rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', color: '#ef4444', fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
+               <div style={{ padding: '0.75rem', background: 'var(--error-glow)', border: '1px solid var(--error-color)', borderRadius: '8px', color: 'var(--error-color)', fontSize: '0.9rem', whiteSpace: 'pre-line' }}>
                  {priceError}
                </div>
             ) : (
-               <div className="premium-input" style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.05)', cursor: 'not-allowed', color: '#fff', fontWeight: '500' }}>
+               <div className="premium-input" style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', cursor: 'not-allowed', color: 'var(--text-main)', fontWeight: '500' }}>
                  ₹{currentPrice ? currentPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
                </div>
             )}

@@ -174,15 +174,29 @@ function Register() {
   }
 
   return (
-    <div className="auth-layout" style={{ display: 'block', padding: '2rem 1rem' }}>
-      <div className="register-container">
-        
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '2.5rem', color: '#fff', marginBottom: '0.5rem' }}>Create your account</h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>Join the next generation of intelligent investing.</p>
+    <div className="auth-layout">
+      {/* Left Side: Brand / AI Visualization */}
+      <div className="auth-left">
+        <div className="ai-visual-container">
+          <div className="ai-grid"></div>
         </div>
+        
+        <div style={{ zIndex: 10 }}>
+          <h1 style={{ fontWeight: '700' }}>StockMind AI</h1>
+          <h2 style={{ color: 'var(--primary-color)', fontSize: '1.5rem', marginBottom: '1.5rem', fontWeight: '600' }}>AI-Powered Market Intelligence</h2>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '2' }}>
+            <li>✓ Analyze stocks.</li>
+            <li>✓ Track investments.</li>
+            <li>✓ Understand market movements.</li>
+          </ul>
+        </div>
+      </div>
 
-        <div className="glass-card">
+      {/* Right Side: Register Form */}
+      <div className="auth-right">
+        <div className="glass-card auth-card" style={{ maxWidth: '600px' }}>
+          <h2 style={{ fontSize: '2rem', color: 'var(--text-primary)', marginBottom: '0.5rem', fontWeight: '700' }}>Create your account</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2rem' }}>Start using AI-powered stock intelligence.</p>
           <form onSubmit={handleRegister}>
             
             <div className="input-group">
@@ -251,7 +265,7 @@ function Register() {
             </div>
 
             {globalError && (
-              <div style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderLeft: '4px solid var(--error-color)', borderRadius: '4px', color: 'var(--error-color)', fontSize: '0.9rem' }}>
+              <div style={{ marginTop: '1rem', padding: '1rem', background: 'var(--error-glow)', borderLeft: '4px solid var(--error-color)', borderRadius: '4px', color: 'var(--error-color)', fontSize: '0.9rem' }}>
                 ⚠️ {globalError}
               </div>
             )}

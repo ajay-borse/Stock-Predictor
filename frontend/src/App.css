@@ -19,9 +19,7 @@
    PREMIUM NAVIGATION
    ========================================================================== */
 .navbar {
-  background: rgba(10, 10, 15, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--card-border);
   padding: 1rem 2rem;
   display: flex;
@@ -41,9 +39,7 @@
 .nav-brand h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(to right, #fff, #94a3b8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-main);
   margin: 0;
 }
 
@@ -61,7 +57,7 @@
 }
 
 .nav-links a:hover, .nav-links a.active {
-  color: #fff;
+  color: var(--primary-color);
   text-shadow: none;
 }
 
@@ -74,7 +70,6 @@
   height: 2px;
   background: var(--primary-color);
   border-radius: 2px;
-  box-shadow: 0 0 8px var(--primary-glow);
 }
 
 .ai-status {
@@ -185,24 +180,12 @@
    ========================================================================== */
 .glass-card {
   background: var(--card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 2.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
   position: relative;
   overflow: hidden;
-}
-
-.glass-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
 }
 
 .input-group {
@@ -222,74 +205,82 @@
 
 .premium-input {
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-surface);
   border: 1px solid var(--card-border);
   border-radius: 8px;
   padding: 0.875rem 1rem;
-  color: #fff;
+  color: var(--text-main);
   font-family: var(--font-body);
   font-size: 1rem;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   outline: none;
 }
 
+.premium-input::placeholder {
+  color: var(--text-muted);
+}
+
 .premium-input:focus {
-  background: rgba(0, 0, 0, 0.4);
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.15);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
 }
 
 .premium-input::placeholder {
-  color: #475569;
+  color: var(--text-muted);
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-  color: #000;
-  font-weight: 600;
-  font-family: var(--font-heading);
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 500;
+  font-family: var(--font-body);
   border: none;
   border-radius: 8px;
-  padding: 1rem 1.5rem;
-  font-size: 1rem;
+  padding: 0.875rem 1.5rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   width: 100%;
-  box-shadow: 0 4px 14px 0 var(--primary-glow);
-  position: relative;
-  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(0, 242, 254, 0.4);
+.primary-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 .primary-btn:active {
-  transform: translateY(1px);
+  transform: translateY(0);
 }
 
 .primary-btn:disabled {
-  background: #334155;
-  color: #94a3b8;
-  box-shadow: none;
+  background: var(--card-border);
+  color: var(--text-muted);
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .secondary-btn {
-  background: transparent;
+  background: #FFFFFF;
   color: var(--text-main);
   border: 1px solid var(--card-border);
   border-radius: 8px;
   padding: 0.5rem 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
+.secondary-btn:hover {
+  background: var(--bg-color);
+}
 
 .secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--card-border);
+  color: var(--text-main);
 }
 
 /* ==========================================================================
@@ -307,15 +298,13 @@
   justify-content: center;
   padding: 4rem;
   position: relative;
-  background: radial-gradient(circle at 30% 50%, rgba(0, 242, 254, 0.08) 0%, transparent 50%);
+  background: var(--bg-color);
 }
 
 .auth-left h1 {
   font-size: 3.5rem;
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text-primary);
 }
 
 .auth-left p {
@@ -337,8 +326,8 @@
   width: 200%; height: 200%;
   top: -50%; left: -50%;
   background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(rgba(79, 70, 229, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 70, 229, 0.04) 1px, transparent 1px);
   background-size: 40px 40px;
   transform: perspective(500px) rotateX(60deg);
   animation: gridMove 20s linear infinite;
@@ -351,12 +340,12 @@
   justify-content: center;
   padding: 2rem;
   background: var(--bg-surface);
-  border-left: 1px solid var(--card-border);
 }
 
 .auth-card {
   width: 100%;
   max-width: 450px;
+  border-radius: 16px;
 }
 
 @media (max-width: 900px) {
@@ -619,7 +608,7 @@
   font-family: var(--font-heading);
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .insight-badge {
@@ -669,7 +658,7 @@
   font-family: var(--font-heading);
   font-size: 2.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .price-value.predicted {
@@ -775,8 +764,8 @@
 }
 
 .metric-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface);
+  border: 1px solid var(--card-border);
   padding: 1.25rem;
   border-radius: 8px;
   text-align: center;
@@ -796,8 +785,8 @@
   font-weight: 700;
 }
 
-.metric-positive { color: var(--success-color); text-shadow: 0 0 10px var(--success-glow); }
-.metric-negative { color: var(--error-color); text-shadow: 0 0 10px var(--error-glow); }
+.metric-positive { color: var(--success-color); }
+.metric-negative { color: var(--error-color); }
 .metric-neutral { color: var(--text-muted); }
 
 .disclaimer-text {
@@ -839,8 +828,8 @@
 }
 
 .time-filter-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
 }
 
 .time-filter-btn.active {
@@ -896,8 +885,8 @@
 
 /* Add to Watchlist Button in Predictor */
 .watchlist-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface);
+  border: 1px solid var(--card-border);
   color: var(--text-muted);
   border-radius: 20px;
   padding: 0.4rem 1rem;
@@ -911,8 +900,8 @@
 }
 
 .watchlist-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
 }
 
 .watchlist-btn.active {
@@ -972,7 +961,7 @@
   text-transform: uppercase;
   color: var(--text-muted);
   letter-spacing: 0.05em;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface);
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
 }
@@ -997,7 +986,7 @@
 }
 
 .analyze-btn:hover {
-  color: #fff;
+  color: var(--text-main);
 }
 
 .remove-init-btn {
@@ -1023,7 +1012,7 @@
 .remove-confirm p {
   margin: 0 0 0.75rem 0;
   font-size: 0.85rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .remove-actions {
@@ -1043,12 +1032,12 @@
 }
 
 .cancel-btn {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
 }
 
 .cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--bg-surface);
 }
 
 .confirm-btn {
@@ -1164,7 +1153,7 @@
 .summary-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 /* Holdings Grid */
@@ -1175,7 +1164,7 @@
 .portfolio-section h3 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .holdings-grid {
@@ -1202,7 +1191,7 @@
 .holding-header h4 {
   font-size: 1.25rem;
   margin: 0;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .holding-quantity {
@@ -1232,7 +1221,7 @@
 }
 
 .detail-item strong {
-  color: #fff;
+  color: var(--text-main);
   font-size: 1.1rem;
 }
 
@@ -1257,11 +1246,11 @@
 }
 
 .holding-actions .secondary-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
 }
 .holding-actions .secondary-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--bg-surface);
 }
 
 .holding-actions .buy-btn {
@@ -1291,7 +1280,7 @@
   display: grid;
   grid-template-columns: 1.5fr 1fr 1fr 1fr 1.5fr 1.5fr;
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface);
   border-bottom: 1px solid rgba(255,255,255,0.1);
   font-size: 0.85rem;
   text-transform: uppercase;
@@ -1314,7 +1303,7 @@
 
 .tx-symbol {
   font-weight: 600;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .tx-type {
@@ -1361,7 +1350,7 @@
 .modal-header h3 {
   font-size: 1.5rem;
   margin: 0;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .close-btn {
@@ -1373,7 +1362,7 @@
   transition: color 0.2s;
 }
 .close-btn:hover {
-  color: #fff;
+  color: var(--text-main);
 }
 
 .modal-subtitle {
@@ -1398,21 +1387,21 @@
 }
 
 .estimated-total {
-  background: rgba(255,255,255,0.05);
+  background: var(--bg-surface);
   border-radius: 8px;
   padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--card-border);
 }
 .estimated-total span {
   color: var(--text-muted);
 }
 .estimated-total strong {
   font-size: 1.25rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .modal-actions {
@@ -1425,8 +1414,8 @@
 }
 
 .modal-actions .secondary-btn {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-main);
   border: none;
   border-radius: 8px;
   font-weight: 600;
@@ -1434,7 +1423,7 @@
   transition: all 0.2s;
 }
 .modal-actions .secondary-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: var(--bg-surface);
 }
 
 .modal-actions .sell-submit {
@@ -1483,9 +1472,9 @@
 }
 
 .skeleton-card {
-  background: rgba(255,255,255,0.03);
+  background: var(--bg-surface);
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid var(--card-border);
   position: relative;
   overflow: hidden;
 }
@@ -1609,7 +1598,7 @@
   font-family: var(--font-heading);
   font-size: 1.75rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .summary-card-v2 .sub-text {
@@ -1632,7 +1621,7 @@
 }
 
 .performance-bar-wrapper {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface);
   height: 24px;
   border-radius: 12px;
   position: relative;
@@ -1687,7 +1676,7 @@
 .performer-info h4 {
   font-size: 1.5rem;
   margin: 0;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .performer-info p {
@@ -1714,7 +1703,7 @@
 .holdings-section h3, .quick-actions-section h3 {
   font-size: 1.25rem;
   margin-bottom: 1.25rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .holdings-list {
@@ -1729,14 +1718,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 1.25rem 1.5rem;
-  background: rgba(255,255,255,0.02);
+  background: var(--bg-surface);
   border: 1px solid var(--card-border);
   border-radius: 12px;
   transition: all 0.3s ease;
 }
 
 .holding-row:hover {
-  background: rgba(255,255,255,0.05);
+  background: var(--bg-surface);
   border-color: rgba(255,255,255,0.1);
   transform: translateY(-2px);
 }
@@ -1751,7 +1740,7 @@
 .holding-symbol {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-main);
   font-family: var(--font-heading);
 }
 
@@ -1782,7 +1771,7 @@
 
 .holding-metric .val {
   font-size: 0.95rem;
-  color: #fff;
+  color: var(--text-main);
   font-weight: 500;
 }
 
@@ -1829,11 +1818,11 @@
 }
 
 .action-card-btn {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-surface);
   border: 1px solid var(--card-border);
   padding: 1rem 1.5rem;
   border-radius: 8px;
-  color: #fff;
+  color: var(--text-main);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1867,7 +1856,7 @@
 .empty-portfolio-premium h3 {
   font-size: 1.75rem;
   margin-bottom: 0.75rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .empty-portfolio-premium p {
@@ -1895,7 +1884,7 @@
 }
 
 .skeleton-box {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-surface);
   border-radius: 8px;
   animation: pulse 1.5s infinite;
 }
@@ -1945,8 +1934,8 @@
 }
 
 .tx-filter-btn:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  background: var(--bg-surface);
 }
 
 .tx-filter-btn.active {
@@ -1972,19 +1961,19 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   border-bottom: 1px solid var(--card-border);
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--bg-color);
 }
 
 .transactions-table td {
   padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--card-border);
   vertical-align: middle;
 }
 
-.transactions-table tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+.transactions-table tbody tr:hover {
+  background: var(--bg-color);
 }
 
 .tx-badge {
@@ -1997,21 +1986,21 @@
 }
 
 .tx-buy {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--success-glow);
   color: var(--success-color);
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
 .tx-sell {
-  background: rgba(239, 68, 68, 0.15);
+  background: var(--error-glow);
   color: var(--error-color);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .tx-symbol {
   font-family: var(--font-heading);
   font-weight: 600;
-  color: #fff;
+  color: var(--text-main);
   letter-spacing: 0.02em;
 }
 
@@ -2096,14 +2085,12 @@
    ========================================================================== */
 
 .ai-insight-card {
-  background: rgba(13, 20, 36, 0.7);
-  border: 1px solid rgba(0, 242, 254, 0.2);
+  background: var(--bg-surface);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   padding: 2rem;
   margin-top: 2rem;
-  box-shadow: 0 4px 30px rgba(0, 242, 254, 0.05);
-  backdrop-filter: blur(10px);
-  color: #fff;
+  color: var(--text-main);
 }
 
 .ai-insight-header {
@@ -2122,7 +2109,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .ai-insight-subtitle {
@@ -2179,7 +2166,7 @@
   justify-content: space-between;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-surface);
   border-radius: 4px;
 }
 
@@ -2205,7 +2192,7 @@
 .movement-large { color: var(--primary-color); }
 
 .insight-interpretation {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-surface);
   padding: 1.5rem;
   border-radius: 8px;
   border-left: 4px solid var(--primary-color);
@@ -2233,9 +2220,9 @@
   gap: 1.5rem;
   margin: 2.5rem 0;
   padding: 1rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--card-bg);
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--card-border);
 }
 
 .flow-node {
@@ -2252,14 +2239,13 @@
 
 .flow-price {
   font-size: 1.25rem;
-  font-weight: 700;
+  font-weight: 600;
   font-family: var(--font-mono);
-  color: #fff;
-  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-main);
+  background: var(--bg-surface);
   padding: 0.75rem 1.25rem;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+  border: 1px solid var(--card-border);
 }
 
 .flow-arrow {
@@ -2275,7 +2261,7 @@
 .flow-line {
   width: 60px;
   height: 2px;
-  background: linear-gradient(90deg, rgba(0,242,254,0.1), rgba(0,242,254,0.8), rgba(0,242,254,0.1));
+  background: var(--primary-color);
   position: relative;
   overflow: hidden;
   margin-top: 0.5rem;
@@ -2346,7 +2332,7 @@
 .dashboard-title-group h2 {
   font-size: 2rem;
   margin-bottom: 0.5rem;
-  color: #fff;
+  color: var(--text-main);
 }
 
 .dashboard-title-group p {

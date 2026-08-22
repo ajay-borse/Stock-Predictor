@@ -210,9 +210,9 @@ function StockPredictor() {
           )}
 
           {error && (
-            <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid rgba(239, 68, 68, 0.3)', boxShadow: '0 0 30px rgba(239, 68, 68, 0.1)' }}>
-              <div className="error-icon" style={{ fontSize: '3.5rem', marginBottom: '1rem', color: '#ef4444', textShadow: '0 0 15px rgba(239, 68, 68, 0.4)' }}>⚠️</div>
-              <h3 style={{ fontSize: '1.75rem', marginBottom: '0.75rem', color: '#fff', fontWeight: '700' }}>{error.title}</h3>
+            <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '4rem 2rem', border: '1px solid var(--error-color)', background: 'var(--error-glow)' }}>
+              <div className="error-icon" style={{ fontSize: '3.5rem', marginBottom: '1rem', color: 'var(--error-color)' }}>⚠️</div>
+              <h3 style={{ fontSize: '1.75rem', marginBottom: '0.75rem', color: 'var(--text-main)', fontWeight: '700' }}>{error.title}</h3>
               <p style={{ color: 'var(--text-main)', fontSize: '1.15rem', marginBottom: '1rem', fontWeight: '500' }}>{error.message}</p>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', marginBottom: '2.5rem', maxWidth: '420px', margin: '0 auto 2.5rem auto', lineHeight: '1.6' }}>{error.subMessage}</p>
               <button 
@@ -221,7 +221,7 @@ function StockPredictor() {
                   setError(null);
                   setSymbol('');
                 }}
-                style={{ maxWidth: '220px', margin: '0 auto', background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)', boxShadow: '0 4px 15px rgba(239, 68, 68, 0.3)', color: '#fff' }}
+                style={{ maxWidth: '220px', margin: '0 auto', background: 'var(--error-color)', color: '#fff' }}
               >
                 {error.buttonText}
               </button>
@@ -287,7 +287,7 @@ function StockPredictor() {
                 </div>
                 <div className="flow-node">
                   <div className="flow-label">PREDICTED PRICE</div>
-                  <div className="flow-price" style={{ color: direction === 'UPWARD' ? 'var(--success-color)' : direction === 'DOWNWARD' ? 'var(--error-color)' : '#fff', borderColor: direction === 'UPWARD' ? 'rgba(16, 185, 129, 0.3)' : direction === 'DOWNWARD' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(255,255,255,0.1)' }}>
+                  <div className="flow-price" style={{ color: direction === 'UPWARD' ? 'var(--success-color)' : direction === 'DOWNWARD' ? 'var(--error-color)' : 'var(--text-main)', borderColor: 'var(--card-border)' }}>
                     {formatPrice(prediction.predicted_price)}
                   </div>
                 </div>
@@ -298,7 +298,7 @@ function StockPredictor() {
                 <div className="insight-interpretation">
                   <p style={{ marginBottom: '0.5rem' }}>{aiExpects}</p>
                   <p style={{ marginBottom: '1rem' }}>{aiComparison}</p>
-                  <p style={{ marginBottom: '1rem', color: 'rgba(255,255,255,0.9)' }}>{modelInterp}</p>
+                  <p style={{ marginBottom: '1rem', color: 'var(--text-main)' }}>{modelInterp}</p>
                   <p style={{ fontWeight: 600, color: 'var(--text-main)' }}>
                     Expected movement: <span className={movementClass}>{movementText}</span>
                   </p>

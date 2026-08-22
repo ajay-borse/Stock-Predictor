@@ -1,23 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Brand Colors - Premium AI Fintech Theme */
-  --primary-color: #00f2fe; /* Cyan glow */
-  --primary-hover: #4facfe; /* Indigo/blue transition */
-  --primary-glow: rgba(0, 242, 254, 0.5);
+  /* Brand Colors - Premium Light Fintech Theme */
+  --primary-color: #4F46E5; /* Indigo/Professional Blue */
+  --primary-hover: #4338CA;
+  --primary-glow: rgba(79, 70, 229, 0.1);
   
-  --bg-color: #050505; /* Deep near-black */
-  --bg-surface: #0a0a0f; 
-  --card-bg: rgba(15, 20, 30, 0.6); /* Glassmorphism surface */
-  --card-border: rgba(255, 255, 255, 0.08);
+  --bg-color: #F5F7FB; /* Light cool gray */
+  --bg-surface: #FFFFFF; /* White */
+  --card-bg: #FFFFFF; /* White card surface */
+  --card-border: #E5E7EB; /* Subtle border */
   
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --text-main: #111827; /* Dark navy/charcoal */
+  --text-secondary: #64748B; /* Slate gray */
+  --text-muted: #94A3B8;
+  --text-dim: #CBD5E1;
   
-  --success-color: #10b981;
-  --success-glow: rgba(16, 185, 129, 0.3);
-  --error-color: #ef4444;
-  --error-glow: rgba(239, 68, 68, 0.3);
+  --success-color: #16A34A;
+  --success-glow: rgba(22, 163, 74, 0.1);
+  --error-color: #DC2626;
+  --error-glow: rgba(220, 38, 38, 0.1);
+  --warning-color: #D97706;
   
   --font-heading: 'Space Grotesk', sans-serif;
   --font-body: 'Inter', sans-serif;
@@ -36,8 +39,6 @@ body {
   line-height: 1.5;
   color: var(--text-main);
   background-color: var(--bg-color);
-  background-image: radial-gradient(circle at 50% 0%, rgba(20, 30, 60, 0.4) 0%, rgba(5, 5, 5, 1) 60%);
-  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -55,7 +56,7 @@ a {
 }
 
 a:hover {
-  text-shadow: 0 0 8px var(--primary-glow);
+  color: var(--primary-hover);
 }
 
 /* Custom Scrollbar */
@@ -63,12 +64,12 @@ a:hover {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94A3B8;
 }

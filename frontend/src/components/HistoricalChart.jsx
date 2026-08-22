@@ -125,7 +125,7 @@ const HistoricalChart = ({ symbol }) => {
     return (
       <div className="glass-card historical-chart-container text-center animate-fade-in" style={{ padding: '3rem 2rem' }}>
         <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--text-muted)', opacity: 0.5 }}>📉</div>
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#fff' }}>Historical Data Unavailable</h3>
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Historical Data Unavailable</h3>
         <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{error}</p>
         <button onClick={fetchHistory} className="secondary-btn" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
           <RefreshCw size={16} /> Try Again
@@ -138,7 +138,7 @@ const HistoricalChart = ({ symbol }) => {
     return (
       <div className="glass-card historical-chart-container text-center animate-fade-in" style={{ padding: '3rem 2rem' }}>
         <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--text-muted)', opacity: 0.5 }}>📉</div>
-        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#fff' }}>Historical Data Unavailable</h3>
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Historical Data Unavailable</h3>
         <p style={{ color: 'var(--text-muted)', marginBottom: '0' }}>We couldn't retrieve historical data for this stock.</p>
       </div>
     );
@@ -148,10 +148,10 @@ const HistoricalChart = ({ symbol }) => {
     <div className="glass-card historical-chart-container animate-fade-in stagger-1" style={{ padding: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end', marginBottom: '1.5rem' }} className="stagger-2">
         <div>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0, background: 'linear-gradient(to right, #06b6d4, #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Historical Price Performance</h3>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0, color: 'var(--text-main)' }}>Historical Price Performance</h3>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0, marginTop: '0.25rem' }}>1-year daily closing price history</p>
         </div>
-        <div className="time-filters" style={{ background: 'rgba(255,255,255,0.05)', borderRadius: '8px', padding: '4px', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="time-filters" style={{ background: 'var(--bg-color)', borderRadius: '8px', padding: '4px', border: '1px solid var(--card-border)' }}>
           {['1M', '3M', '6M', '1Y'].map(range => (
             <button
               key={range}
@@ -166,26 +166,26 @@ const HistoricalChart = ({ symbol }) => {
 
       {/* Daily Market Data Section */}
       {activePoint && (
-        <div className="market-data-bar stagger-3" style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between' }}>
+        <div className="market-data-bar stagger-3" style={{ background: 'var(--bg-color)', padding: '1rem', borderRadius: '12px', border: '1px solid var(--card-border)', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'space-between' }}>
           <div className="market-data-item">
             <div className="label">Date</div>
-            <div className="value" style={{ color: '#67e8f9' }}>{formatDate(activePoint.date)}</div>
+            <div className="value" style={{ color: 'var(--text-main)' }}>{formatDate(activePoint.date)}</div>
           </div>
           <div className="market-data-item">
             <div className="label">Open</div>
-            <div className="value">{formatCurrency(activePoint.open)}</div>
+            <div className="value" style={{ color: 'var(--text-main)' }}>{formatCurrency(activePoint.open)}</div>
           </div>
           <div className="market-data-item">
             <div className="label">High</div>
-            <div className="value" style={{ color: '#34d399' }}>{formatCurrency(activePoint.high)}</div>
+            <div className="value" style={{ color: 'var(--success-color)' }}>{formatCurrency(activePoint.high)}</div>
           </div>
           <div className="market-data-item">
             <div className="label">Low</div>
-            <div className="value" style={{ color: '#fb7185' }}>{formatCurrency(activePoint.low)}</div>
+            <div className="value" style={{ color: 'var(--error-color)' }}>{formatCurrency(activePoint.low)}</div>
           </div>
           <div className="market-data-item">
             <div className="label">Volume</div>
-            <div className="value" style={{ color: '#d8b4fe' }}>{formatVolume(activePoint.volume)}</div>
+            <div className="value" style={{ color: 'var(--primary-color)' }}>{formatVolume(activePoint.volume)}</div>
           </div>
         </div>
       )}
@@ -201,19 +201,19 @@ const HistoricalChart = ({ symbol }) => {
           >
             <defs>
               <linearGradient id="colorClose" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.8}/>
-                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" vertical={false} />
             <XAxis 
               dataKey="date" 
               tickFormatter={(dateStr) => {
                 const date = new Date(dateStr);
                 return `${date.getDate()} ${date.toLocaleString('en-US', { month: 'short' })}`;
               }}
-              stroke="rgba(255,255,255,0.3)"
-              tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
+              stroke="var(--card-border)"
+              tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
               minTickGap={30}
               axisLine={false}
               tickLine={false}
@@ -221,8 +221,8 @@ const HistoricalChart = ({ symbol }) => {
             />
             <YAxis 
               domain={['auto', 'auto']}
-              stroke="rgba(255,255,255,0.3)"
-              tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }}
+              stroke="var(--card-border)"
+              tick={{ fill: 'var(--text-muted)', fontSize: 12 }}
               tickFormatter={(val) => `₹${val}`}
               axisLine={false}
               tickLine={false}
@@ -230,24 +230,24 @@ const HistoricalChart = ({ symbol }) => {
             />
             <Tooltip
               contentStyle={{ 
-                backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                borderColor: 'rgba(6, 182, 212, 0.3)',
+                backgroundColor: 'var(--card-bg)', 
+                borderColor: 'var(--card-border)',
                 borderRadius: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                boxShadow: '0 8px 30px rgba(15, 23, 42, 0.06)'
               }}
-              itemStyle={{ color: '#06b6d4', fontWeight: 600 }}
-              labelStyle={{ color: '#94a3b8', marginBottom: '4px' }}
+              itemStyle={{ color: 'var(--text-main)', fontWeight: 600 }}
+              labelStyle={{ color: 'var(--text-muted)', marginBottom: '4px' }}
               labelFormatter={(label) => formatDate(label)}
               formatter={(value) => [formatCurrency(value), 'Close']}
-              cursor={{ stroke: 'rgba(6, 182, 212, 0.4)', strokeWidth: 1, strokeDasharray: '4 4' }}
+              cursor={{ stroke: 'var(--card-border)', strokeWidth: 1, strokeDasharray: '4 4' }}
             />
             <Line
               type="monotone"
               dataKey="close"
-              stroke="#06b6d4"
+              stroke="#4F46E5"
               strokeWidth={2}
               dot={false}
-              activeDot={{ r: 6, fill: '#06b6d4', stroke: '#0f172a', strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: '#4F46E5', stroke: 'var(--card-bg)', strokeWidth: 2 }}
               animationDuration={1500}
             />
           </LineChart>
@@ -265,26 +265,29 @@ const HistoricalChart = ({ symbol }) => {
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" vertical={false} />
               <XAxis dataKey="date" hide />
               <YAxis 
                 hide 
                 domain={[0, 'auto']} 
               />
               <Tooltip
-                cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                cursor={{ fill: 'rgba(0,0,0,0.02)' }}
                 contentStyle={{ 
-                  backgroundColor: 'rgba(15, 23, 42, 0.9)', 
-                  borderColor: 'rgba(139, 92, 246, 0.3)',
-                  borderRadius: '8px'
+                  backgroundColor: 'var(--card-bg)', 
+                  borderColor: 'var(--card-border)',
+                  borderRadius: '8px',
+                  boxShadow: '0 8px 30px rgba(15, 23, 42, 0.06)'
                 }}
+                itemStyle={{ color: 'var(--text-main)', fontWeight: 600 }}
+                labelStyle={{ color: 'var(--text-muted)', marginBottom: '4px' }}
                 labelFormatter={(label) => formatDate(label)}
                 formatter={(value) => [formatVolume(value), 'Volume']}
               />
               <Bar 
                 dataKey="volume" 
-                fill="#8b5cf6" 
-                opacity={0.7}
+                fill="#4F46E5" 
+                opacity={0.3}
                 radius={[2, 2, 0, 0]}
                 animationDuration={1500}
               />

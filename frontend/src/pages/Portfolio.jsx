@@ -25,7 +25,7 @@ const Portfolio = () => {
       setLoading(true);
       setError(null);
       const [portfolioRes, transactionsRes] = await Promise.all([
-        api.get('stocks/portfolio/analytics'),
+        api.get('stocks/portfolio/analytics/'),
         api.get('stocks/transactions/')
       ]);
       setPortfolio(portfolioRes.data);
@@ -62,7 +62,7 @@ const Portfolio = () => {
   };
 
   const handleAnalyze = (symbol) => {
-    navigate('/', { state: { symbol } });
+    navigate('/prediction', { state: { symbol } });
   };
 
   const formatCurrency = (val) => {
@@ -87,8 +87,6 @@ const Portfolio = () => {
   const totalPL = portfolio?.total_profit_loss || 0;
   const totalPLPct = portfolio?.profit_loss_percentage || 0;
   const holdings = portfolio?.holdings || [];
-  const bestPerformer = portfolio?.best_performer;
-  const worstPerformer = portfolio?.worst_performer;
 
   // Performance Bar calculation
   const maxBarValue = Math.max(totalInvested, currentValue, 1);
@@ -100,22 +98,17 @@ const Portfolio = () => {
       <Navbar />
       
       <main className="main-content">
-        <header className="portfolio-header-content animate-fade-in">
-          <div className="portfolio-title-group">
-            <h2>My Portfolio</h2>
-            <p>Your AI-powered investment overview.</p>
-          </div>
-          <div className="ai-intelligence-badge">
-            <div className="ai-status-dot"></div>
-            Portfolio Intelligence
+        <header className="dashboard-header animate-fade-in" style={{ marginBottom: '2rem' }}>
+          <div className="dashboard-title-group">
+            <h2 style={{ fontSize: '1.75rem', fontWeight: '600' }}>Portfolio</h2>
+            <p style={{ color: 'var(--text-muted)' }}>Your investment performance.</p>
           </div>
         </header>
 
         {error && (
-          <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '2rem' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#ef4444' }}>⚠️</div>
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#fff' }}>{error}</h3>
-            <button className="primary-btn" onClick={fetchData} style={{ maxWidth: '200px', margin: '1.5rem auto 0', background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' }}>
+          <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '2rem', border: '1px solid var(--error-color)', background: 'var(--error-glow)', marginBottom: '1.5rem' }}>
+            <p style={{ color: 'var(--error-color)', fontWeight: '500', margin: 0 }}>⚠️ {error}</p>
+            <button className="primary-btn" onClick={fetchData} style={{ marginTop: '1rem', width: 'auto' }}>
               Retry
             </button>
           </div>
@@ -126,180 +119,118 @@ const Portfolio = () => {
             <div className="skeleton-grid">
               {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-box" style={{ height: '120px' }}></div>)}
             </div>
-            <div className="skeleton-box" style={{ height: '180px' }}></div>
-            <div className="skeleton-box" style={{ height: '300px' }}></div>
+            <div className="skeleton-box" style={{ height: '300px', marginTop: '2rem' }}></div>
           </div>
         ) : !error && portfolio && (
           <>
-            {/* 2. SUMMARY CARDS */}
-            <div className="summary-grid-v2 animate-fade-in stagger-1">
-              <div className="glass-card summary-card-v2">
-                <span className="label">Total Invested</span>
-                <span className="value">{formatCurrency(totalInvested)}</span>
-                <span className="sub-text">Principal Amount</span>
+            {/* SUMMARY CARDS */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+              <div className="glass-card" style={{ padding: '1.5rem' }}>
+                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Invested</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-main)' }}>{formatCurrency(totalInvested)}</span>
               </div>
-              <div className="glass-card summary-card-v2">
-                <span className="label">Current Value</span>
-                <span className="value">{formatCurrency(currentValue)}</span>
-                <span className="sub-text">Market Valuation</span>
+              <div className="glass-card" style={{ padding: '1.5rem' }}>
+                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Current Value</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text-main)' }}>{formatCurrency(currentValue)}</span>
               </div>
-              <div className="glass-card summary-card-v2">
-                <span className="label">Total Profit / Loss</span>
-                <span className={`value ${getProfitClass(totalPL)}`}>
+              <div className="glass-card" style={{ padding: '1.5rem' }}>
+                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Total Profit / Loss</span>
+                <span className={getProfitClass(totalPL)} style={{ fontSize: '1.5rem', fontWeight: 600 }}>
                   {totalPL > 0 ? '+' : ''}{formatCurrency(totalPL).replace('₹-', '-₹')}
                 </span>
-                <span className="sub-text">Overall Earnings</span>
               </div>
-              <div className="glass-card summary-card-v2">
-                <span className="label">Return</span>
-                <span className={`value ${getProfitClass(totalPLPct)}`}>
+              <div className="glass-card" style={{ padding: '1.5rem' }}>
+                <span style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Return</span>
+                <span className={getProfitClass(totalPLPct)} style={{ fontSize: '1.5rem', fontWeight: 600 }}>
                   {formatPercentage(totalPLPct)}
                 </span>
-                <span className="sub-text">Net Yield</span>
               </div>
             </div>
 
-            {/* 3. PORTFOLIO PERFORMANCE */}
+            {/* PORTFOLIO PERFORMANCE */}
             {holdings.length > 0 && (
-              <div className="glass-card performance-section animate-fade-in stagger-2">
-                <div className="performance-header">
-                  <h3>Portfolio Performance</h3>
-                  <div className="ai-status" style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
-                    <div className="ai-status-dot"></div> Live Analysis
-                  </div>
-                </div>
+              <div className="glass-card animate-fade-in" style={{ padding: '2rem', marginBottom: '2rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-main)' }}>Performance Chart</h3>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                   <div>
-                    <div className="performance-labels" style={{ marginBottom: '0.5rem' }}>
-                      <span>Invested Value</span>
-                      <span style={{ color: '#fff', fontWeight: 500 }}>{formatCurrency(totalInvested)}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Invested Value</span>
+                      <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{formatCurrency(totalInvested)}</span>
                     </div>
-                    <div className="performance-bar-wrapper">
-                      <div className="performance-bar-fill" style={{ width: investedWidth, background: 'linear-gradient(90deg, #475569, #94a3b8)', boxShadow: 'none' }}></div>
+                    <div style={{ width: '100%', height: '8px', background: 'var(--bg-surface)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: investedWidth, height: '100%', background: 'var(--text-muted)', borderRadius: '4px' }}></div>
                     </div>
                   </div>
 
                   <div>
-                    <div className="performance-labels" style={{ marginBottom: '0.5rem' }}>
-                      <span>Current Value</span>
-                      <span style={{ color: '#fff', fontWeight: 500 }}>{formatCurrency(currentValue)}</span>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Current Value</span>
+                      <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{formatCurrency(currentValue)}</span>
                     </div>
-                    <div className="performance-bar-wrapper">
-                      <div className="performance-bar-fill" style={{ width: currentWidth, background: totalPL >= 0 ? 'linear-gradient(90deg, #10b981, #34d399)' : 'linear-gradient(90deg, #ef4444, #f87171)' }}></div>
+                    <div style={{ width: '100%', height: '8px', background: 'var(--bg-surface)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: currentWidth, height: '100%', background: totalPL >= 0 ? 'var(--success-color)' : 'var(--error-color)', borderRadius: '4px' }}></div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* 5. BEST & WORST PERFORMER */}
-            {holdings.length > 0 && (bestPerformer || worstPerformer) && (
-              <div className="performers-grid animate-fade-in stagger-3">
-                {bestPerformer && (
-                  <div className="performer-card best">
-                    <div className="performer-info">
-                      <p style={{ color: 'var(--success-color)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', fontSize: '0.75rem', fontWeight: 600 }}>Best Performer</p>
-                      <h4>{bestPerformer.symbol}</h4>
-                      <p>{formatCurrency(bestPerformer.current_price)}</p>
-                    </div>
-                    <div className="performer-metrics metric-positive">
-                      <div className="pl">+{formatCurrency(bestPerformer.profit_loss)}</div>
-                      <div className="ret">{formatPercentage(bestPerformer.profit_loss_percentage)}</div>
-                    </div>
-                  </div>
-                )}
-                {worstPerformer && (
-                  <div className="performer-card worst">
-                    <div className="performer-info">
-                      <p style={{ color: 'var(--error-color)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.25rem', fontSize: '0.75rem', fontWeight: 600 }}>Worst Performer</p>
-                      <h4>{worstPerformer.symbol}</h4>
-                      <p>{formatCurrency(worstPerformer.current_price)}</p>
-                    </div>
-                    <div className="performer-metrics metric-negative">
-                      <div className="pl">{formatCurrency(worstPerformer.profit_loss).replace('₹-', '-₹')}</div>
-                      <div className="ret">{formatPercentage(worstPerformer.profit_loss_percentage)}</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* 4. HOLDINGS */}
-            <div className="holdings-section animate-fade-in stagger-4">
-              <h3>Your Holdings</h3>
+            {/* HOLDINGS */}
+            <div className="animate-fade-in">
+              <h3 style={{ margin: 0, fontSize: '1.2rem', marginBottom: '1.5rem', color: 'var(--text-main)' }}>Your Holdings</h3>
               
               {holdings.length === 0 ? (
-                /* 7. EMPTY PORTFOLIO */
-                <div className="glass-card empty-portfolio-premium">
-                  <div className="icon">✦</div>
-                  <h3>Your portfolio is empty.</h3>
-                  <p>Start building your investment portfolio with AI-powered market insights and predictive analytics.</p>
-                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                    <button className="primary-btn" style={{ maxWidth: '200px' }} onClick={() => navigate('/')}>Explore Stocks</button>
-                    <button className="secondary-btn" onClick={() => navigate('/watchlist')}>View Watchlist</button>
-                  </div>
+                <div className="glass-card empty-state-compact" style={{ textAlign: 'center', padding: '4rem 2rem', background: 'var(--bg-surface)' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem', color: 'var(--text-dim)' }}>📈</div>
+                  <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: 'var(--text-main)' }}>Your portfolio is empty</h3>
+                  <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Start building your investment portfolio with AI insights.</p>
+                  <button className="primary-btn" style={{ width: 'auto' }} onClick={() => navigate('/prediction')}>Explore Stocks</button>
                 </div>
               ) : (
-                <div className="holdings-list">
-                  {holdings.map((holding) => (
-                    <div key={holding.id || holding.symbol} className="holding-row">
-                      <div className="holding-main">
-                        <span className="holding-symbol">{holding.symbol}</span>
-                        <span className="holding-quantity">{holding.quantity} Shares</span>
-                      </div>
-                      
-                      <div className="holding-metrics-grid">
-                        <div className="holding-metric">
-                          <span className="lbl">Avg Buy Price</span>
-                          <span className="val">{formatCurrency(holding.average_buy_price)}</span>
-                        </div>
-                        <div className="holding-metric">
-                          <span className="lbl">Current Price</span>
-                          <span className="val">{formatCurrency(holding.current_price)}</span>
-                        </div>
-                        <div className="holding-metric">
-                          <span className="lbl">Invested</span>
-                          <span className="val">{formatCurrency(holding.invested_amount)}</span>
-                        </div>
-                        <div className="holding-metric">
-                          <span className="lbl">Current Value</span>
-                          <span className="val">{formatCurrency(holding.current_value)}</span>
-                        </div>
-                        <div className="holding-metric">
-                          <span className="lbl">P/L</span>
-                          <span className={`val ${getProfitClass(holding.profit_loss)}`}>
+                <div className="glass-card transactions-table-wrapper" style={{ padding: 0, background: 'var(--bg-surface)' }}>
+                  <table className="transactions-table">
+                    <thead>
+                      <tr>
+                        <th>Stock</th>
+                        <th>Qty</th>
+                        <th>Avg Buy</th>
+                        <th>Current Price</th>
+                        <th>Invested</th>
+                        <th>Current Value</th>
+                        <th>P/L</th>
+                        <th>Return</th>
+                        <th style={{ textAlign: 'right' }}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {holdings.map((holding) => (
+                        <tr key={holding.id || holding.symbol}>
+                          <td style={{ fontWeight: 600, color: 'var(--text-main)' }}>{holding.symbol}</td>
+                          <td style={{ color: 'var(--text-main)' }}>{holding.quantity}</td>
+                          <td style={{ color: 'var(--text-main)' }}>{formatCurrency(holding.average_buy_price)}</td>
+                          <td style={{ color: 'var(--text-main)' }}>{formatCurrency(holding.current_price)}</td>
+                          <td style={{ color: 'var(--text-main)' }}>{formatCurrency(holding.invested_amount)}</td>
+                          <td style={{ color: 'var(--text-main)' }}>{formatCurrency(holding.current_value)}</td>
+                          <td className={getProfitClass(holding.profit_loss)}>
                             {holding.profit_loss > 0 ? '+' : ''}{formatCurrency(holding.profit_loss).replace('₹-', '-₹')}
-                          </span>
-                        </div>
-                        <div className="holding-metric">
-                          <span className="lbl">Return</span>
-                          <span className={`val ${getProfitClass(holding.profit_loss_percentage)}`}>
+                          </td>
+                          <td className={getProfitClass(holding.profit_loss_percentage)}>
                             {formatPercentage(holding.profit_loss_percentage)}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="holding-actions-group">
-                        <button className="secondary-btn" onClick={() => handleAnalyze(holding.symbol)}>View</button>
-                        <button className="buy-btn" onClick={() => openModal('buy', holding.symbol)}>Buy</button>
-                        <button className="sell-btn" onClick={() => openModal('sell', holding.symbol, holding.quantity)}>Sell</button>
-                      </div>
-                    </div>
-                  ))}
+                          </td>
+                          <td style={{ textAlign: 'right' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                              <button className="secondary-btn" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }} onClick={() => handleAnalyze(holding.symbol)}>Analyze</button>
+                              <button className="primary-btn" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', width: 'auto', background: 'var(--success-color)' }} onClick={() => openModal('buy', holding.symbol)}>Buy</button>
+                              <button className="primary-btn" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', width: 'auto', background: 'var(--error-color)' }} onClick={() => openModal('sell', holding.symbol, holding.quantity)}>Sell</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               )}
-            </div>
-
-            {/* 6. QUICK ACTIONS */}
-            <div className="quick-actions-section animate-fade-in stagger-5" style={{ marginTop: '3rem' }}>
-              <h3>Quick Actions</h3>
-              <div className="quick-actions-row">
-                <button className="action-card-btn" onClick={() => navigate('/')}>+ Buy Stock</button>
-                <button className="action-card-btn" onClick={() => navigate('/watchlist')}>View Watchlist</button>
-                <button className="action-card-btn" onClick={() => navigate('/')}>AI Prediction</button>
-                <button className="action-card-btn" onClick={() => navigate('/transactions')}>Transactions</button>
-              </div>
             </div>
           </>
         )}

@@ -64,10 +64,10 @@ const Transactions = () => {
         </header>
 
         {error && (
-          <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '2rem' }}>
-            <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: '#ef4444' }}>⚠️</div>
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: '#fff' }}>{error}</h3>
-            <button className="primary-btn" onClick={fetchTransactions} style={{ maxWidth: '200px', margin: '1.5rem auto 0', background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)' }}>
+          <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid var(--error-color)', background: 'var(--error-glow)', marginBottom: '2rem' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--error-color)' }}>⚠️</div>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>{error}</h3>
+            <button className="primary-btn" onClick={fetchTransactions} style={{ maxWidth: '200px', margin: '1.5rem auto 0', background: 'var(--error-color)' }}>
               Retry
             </button>
           </div>
@@ -184,9 +184,9 @@ const Transactions = () => {
                           <span className="lbl">Price</span>
                           <span className="val">{formatCurrency(tx.price)}</span>
                         </div>
-                        <div className="tx-detail">
+                        <div className="tx-meta">
                           <span className="lbl">Total</span>
-                          <span className="val" style={{ fontWeight: 600, color: '#fff' }}>{formatCurrency(tx.total_amount)}</span>
+                          <span className="val" style={{ fontWeight: 600, color: 'var(--text-main)' }}>{formatCurrency(tx.total_amount)}</span>
                         </div>
                       </div>
                       

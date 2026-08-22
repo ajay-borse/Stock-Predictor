@@ -55,19 +55,21 @@ function Login() {
         </div>
         
         <div style={{ zIndex: 10 }}>
-          <h1>StockMind AI</h1>
-          <p>
-            Intelligent market insights.<br/>
-            Powered by data. Driven by AI.
-          </p>
+          <h1 style={{ fontWeight: '700' }}>StockMind AI</h1>
+          <h2 style={{ color: 'var(--primary-color)', fontSize: '1.5rem', marginBottom: '1.5rem', fontWeight: '600' }}>AI-Powered Market Intelligence</h2>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '2' }}>
+            <li>✓ Analyze stocks.</li>
+            <li>✓ Track investments.</li>
+            <li>✓ Understand market movements.</li>
+          </ul>
         </div>
       </div>
 
       {/* Right Side: Login Form */}
       <div className="auth-right">
         <div className="glass-card auth-card">
-          <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: '#fff' }}>Welcome back</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Sign in to access your intelligence dashboard.</p>
+          <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--text-primary)', fontWeight: '700' }}>Welcome back</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Sign in to access your StockMind AI dashboard.</p>
 
           <form onSubmit={handleLogin}>
             <div className="input-group">
@@ -116,7 +118,7 @@ function Login() {
           </form>
 
           {error && (
-            <div className="field-error" style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>
+            <div className="field-error" style={{ marginTop: '1rem', padding: '1rem', background: 'var(--error-glow)', borderRadius: '8px' }}>
               ⚠️ {error}
             </div>
           )}
