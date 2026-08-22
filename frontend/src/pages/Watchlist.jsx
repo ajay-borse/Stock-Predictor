@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
+import TransactionModal from '../components/TransactionModal';
+import { useToast, Toast } from '../components/Toast';
 import '../App.css';
+
 
 const Watchlist = () => {
   const [watchlist, setWatchlist] = useState([]);
@@ -10,7 +13,18 @@ const Watchlist = () => {
   const [error, setError] = useState(null);
   const [removingSymbol, setRemovingSymbol] = useState(null);
   const [notification, setNotification] = useState(null);
-  
+
+  // Global Buy Modal State
+  const { toast, showToast } = useToast();
+  const [modal, setModal] = useState({ isOpen: false, type: 'buy', symbol: '', availableShares: 0 });
+
+  const openBuyModal = (sym) => setModal({ isOpen: true, type: 'buy', symbol: sym, availableShares: 0 });
+  const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
+  const handleTransactionSuccess = (sym, type) => {
+    closeModal();
+    showToast(`✓ ${sym} purchased successfully.`);
+  };
+
   const navigate = useNavigate();
 
   const fetchWatchlist = async () => {
@@ -116,11 +130,14 @@ const Watchlist = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="card-actions">
-                        <button className="analyze-btn" onClick={() => handleAnalyze(item.symbol)}>
-                          View Analysis →
+                      <div className="card-actions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.5rem' }}>
+                        <button className="analyze-btn" style={{ padding: '0.5rem', fontSize: '0.85rem' }} onClick={() => handleAnalyze(item.symbol)}>
+                          Analyze
                         </button>
-                        <button className="remove-init-btn" onClick={() => setRemovingSymbol(item.symbol)}>
+                        <button className="buy-btn" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--success-color)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: '600', padding: '0.5rem', fontSize: '0.85rem' }} onClick={() => openBuyModal(item.symbol)}>
+                          Buy
+                        </button>
+                        <button className="remove-init-btn" style={{ padding: '0.5rem', fontSize: '0.85rem' }} onClick={() => setRemovingSymbol(item.symbol)}>
                           Remove
                         </button>
                       </div>
@@ -132,6 +149,17 @@ const Watchlist = () => {
           </>
         )}
       </main>
+
+      <TransactionModal
+        isOpen={modal.isOpen}
+        type={modal.type}
+        symbol={modal.symbol}
+        availableShares={modal.availableShares}
+        onClose={closeModal}
+        onSuccess={handleTransactionSuccess}
+      />
+
+      <Toast toast={toast} />
     </div>
   );
 };

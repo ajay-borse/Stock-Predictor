@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import StockPredictor from './pages/StockPredictor';
 import Watchlist from './pages/Watchlist';
+import Portfolio from './pages/Portfolio';
 import './App.css';
 
 function App() {
@@ -28,6 +29,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Watchlist />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/portfolio" 
+          element={
+            <ProtectedRoute>
+              <Portfolio />
             </ProtectedRoute>
           } 
         />

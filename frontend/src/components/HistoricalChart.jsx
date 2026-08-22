@@ -40,12 +40,20 @@ const HistoricalChart = ({ symbol }) => {
     try {
       const response = await api.get(`stocks/history/?symbol=${symbol}`);
       // Assumes response.data.data contains the array of records
-      if (response.data && response.data.data) {
-        // Ensure data is sorted by date ascending
-        const sortedData = [...response.data.data].sort((a, b) => new Date(a.date) - new Date(b.date));
-        setData(sortedData);
-        if (sortedData.length > 0) {
+      if (response.data && Array.isArray(response.data.data) && response.data.data.length > 0) {
+        const validData = response.data.data.filter(d => 
+          d.date && 
+          typeof d.close === 'number' && !isNaN(d.close) && isFinite(d.close) &&
+          typeof d.open === 'number' && !isNaN(d.open) && isFinite(d.open) &&
+          typeof d.volume === 'number' && !isNaN(d.volume) && isFinite(d.volume)
+        );
+
+        if (validData.length > 0) {
+          const sortedData = [...validData].sort((a, b) => new Date(a.date) - new Date(b.date));
+          setData(sortedData);
           setActivePoint(sortedData[sortedData.length - 1]);
+        } else {
+          setData([]);
         }
       } else {
         setData([]);
@@ -115,10 +123,12 @@ const HistoricalChart = ({ symbol }) => {
 
   if (error) {
     return (
-      <div className="glass-card historical-chart-container text-center" style={{ padding: '1.5rem' }}>
-        <div style={{ color: 'var(--error-color)', marginBottom: '1rem' }}>{error}</div>
-        <button onClick={fetchHistory} className="secondary-btn" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', margin: '0 auto' }}>
-          <RefreshCw size={16} /> Retry
+      <div className="glass-card historical-chart-container text-center animate-fade-in" style={{ padding: '3rem 2rem' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--text-muted)', opacity: 0.5 }}>📉</div>
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#fff' }}>Historical Data Unavailable</h3>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{error}</p>
+        <button onClick={fetchHistory} className="secondary-btn" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+          <RefreshCw size={16} /> Try Again
         </button>
       </div>
     );
@@ -126,8 +136,10 @@ const HistoricalChart = ({ symbol }) => {
 
   if (data.length === 0) {
     return (
-      <div className="glass-card historical-chart-container text-center" style={{ padding: '1.5rem', color: 'var(--text-muted)' }}>
-        No historical data available for this stock.
+      <div className="glass-card historical-chart-container text-center animate-fade-in" style={{ padding: '3rem 2rem' }}>
+        <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--text-muted)', opacity: 0.5 }}>📉</div>
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#fff' }}>Historical Data Unavailable</h3>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '0' }}>We couldn't retrieve historical data for this stock.</p>
       </div>
     );
   }
