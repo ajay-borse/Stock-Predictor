@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
+import '../App.css';
 
 const Transactions = () => {
   const navigate = useNavigate();
@@ -17,7 +18,13 @@ const Transactions = () => {
       const res = await api.get('stocks/transactions/');
       setTransactions(res.data);
     } catch (err) {
-      setError('Unable to load transactions. Please try again later.');
+      if (err.response?.status === 401) {
+        setError("Your session has expired. Please login again.");
+      } else if (!err.response) {
+        setError("Unable to connect to the server. Please check your network.");
+      } else {
+        setError('Unable to load transactions. Please try again later.');
+      }
     } finally {
       setLoading(false);
     }
@@ -42,7 +49,7 @@ const Transactions = () => {
   };
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
@@ -51,23 +58,22 @@ const Transactions = () => {
       <Navbar />
 
       <main className="main-content">
-        {/* Header */}
-        <header className="portfolio-header-content animate-fade-in">
-          <div className="portfolio-title-group">
-            <h2>Transaction History</h2>
-            <p>Track every buy and sell activity in your portfolio.</p>
+        <header className="dashboard-header animate-fade-in" style={{ marginBottom: '2.5rem', alignItems: 'flex-start' }}>
+          <div className="dashboard-title-group">
+            <h2 style={{ fontSize: '2rem', fontWeight: '700', color: 'var(--text-main)' }}>Transaction Intelligence</h2>
+            <p style={{ color: 'var(--text-muted)', fontSize: '1rem', marginTop: '0.25rem' }}>Track and filter every buy and sell activity.</p>
           </div>
-          <div className="ai-intelligence-badge">
-            <div className="ai-status-dot"></div>
-            AI TRANSACTION INTELLIGENCE
-          </div>
+          <button className="secondary-btn" onClick={() => navigate('/portfolio')} style={{ width: 'auto' }}>
+            View Portfolio
+          </button>
         </header>
 
         {error && (
-          <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid var(--error-color)', background: 'var(--error-glow)', marginBottom: '2rem' }}>
+          <div className="glass-card error-state-card animate-fade-in" style={{ textAlign: 'center', padding: '3rem 2rem', border: '1px solid var(--error-color)', background: 'var(--error-glow)', marginBottom: '2rem', borderRadius: '12px' }}>
             <div style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--error-color)' }}>⚠️</div>
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>{error}</h3>
-            <button className="primary-btn" onClick={fetchTransactions} style={{ maxWidth: '200px', margin: '1.5rem auto 0', background: 'var(--error-color)' }}>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: 'var(--text-main)' }}>Unable to load transactions</h3>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>{error}</p>
+            <button className="primary-btn" onClick={fetchTransactions} style={{ maxWidth: '200px', margin: '0 auto', background: 'var(--error-color)' }}>
               Retry
             </button>
           </div>
@@ -75,131 +81,98 @@ const Transactions = () => {
 
         {loading ? (
           <div className="skeleton-dashboard animate-fade-in">
-            <div className="skeleton-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
-              {[1, 2, 3].map(i => <div key={i} className="skeleton-box" style={{ height: '100px' }}></div>)}
+            <div className="skeleton-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: '2rem' }}>
+              {[1, 2, 3].map(i => <div key={i} className="skeleton-box" style={{ height: '120px', borderRadius: '16px' }}></div>)}
             </div>
-            <div className="skeleton-box" style={{ height: '400px', marginTop: '2rem' }}></div>
+            <div className="skeleton-box" style={{ height: '400px', borderRadius: '16px' }}></div>
           </div>
         ) : !error && (
           <>
             {/* Summary Cards */}
-            <div className="transactions-summary-grid animate-fade-in stagger-1">
-              <div className="glass-card summary-card-v2">
-                <span className="label">Total Transactions</span>
-                <span className="value">{totalTransactions}</span>
+            <div className="animate-fade-in" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+              <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '16px', background: 'var(--bg-surface)' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Total Transactions</span>
+                <span style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-main)' }}>{totalTransactions}</span>
               </div>
-              <div className="glass-card summary-card-v2">
-                <span className="label">Buy Orders</span>
-                <span className="value" style={{ color: 'var(--success-color)' }}>{buyOrders}</span>
+              <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '16px', background: 'var(--bg-surface)' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Buy Orders</span>
+                <span style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--success-color)' }}>{buyOrders}</span>
               </div>
-              <div className="glass-card summary-card-v2">
-                <span className="label">Sell Orders</span>
-                <span className="value" style={{ color: 'var(--error-color)' }}>{sellOrders}</span>
+              <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '16px', background: 'var(--bg-surface)' }}>
+                <span style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.75rem' }}>Sell Orders</span>
+                <span style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--error-color)' }}>{sellOrders}</span>
               </div>
             </div>
 
             {/* Main Content Area */}
             {transactions.length === 0 ? (
-              <div className="glass-card empty-portfolio-premium animate-fade-in stagger-2" style={{ marginTop: '2rem' }}>
-                <div className="icon">📋</div>
-                <h3>No transactions yet.</h3>
-                <p>Your completed stock transactions will appear here.</p>
+              <div className="glass-card animate-fade-in" style={{ textAlign: 'center', padding: '5rem 2rem', background: 'var(--bg-surface)', borderRadius: '16px' }}>
+                <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem', color: 'var(--text-dim)' }}>🧾</div>
+                <h3 style={{ fontSize: '1.5rem', marginBottom: '0.75rem', color: 'var(--text-main)', fontWeight: '600' }}>No transactions yet</h3>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '1.05rem' }}>Your completed buy and sell activity will appear here.</p>
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                  <button className="primary-btn" style={{ maxWidth: '200px' }} onClick={() => navigate('/')}>Explore Stocks</button>
-                  <button className="secondary-btn" onClick={() => navigate('/portfolio')}>View Portfolio</button>
+                  <button className="primary-btn" style={{ width: 'auto', padding: '0.75rem 2rem' }} onClick={() => navigate('/')}>Explore Stocks</button>
                 </div>
               </div>
             ) : (
-              <div className="transactions-container animate-fade-in stagger-2" style={{ marginTop: '2rem' }}>
+              <div className="animate-fade-in" style={{ background: 'var(--bg-surface)', borderRadius: '16px', border: '1px solid var(--card-border)', overflow: 'hidden' }}>
                 {/* Filters */}
-                <div className="transactions-filters">
-                  <button className={`tx-filter-btn ${filter === 'ALL' ? 'active' : ''}`} onClick={() => setFilter('ALL')}>ALL</button>
-                  <button className={`tx-filter-btn ${filter === 'BUY' ? 'active' : ''}`} onClick={() => setFilter('BUY')}>BUY</button>
-                  <button className={`tx-filter-btn ${filter === 'SELL' ? 'active' : ''}`} onClick={() => setFilter('SELL')}>SELL</button>
+                <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--card-border)', display: 'flex', gap: '0.75rem' }}>
+                  <button onClick={() => setFilter('ALL')} style={{ padding: '0.5rem 1.5rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', transition: 'all 0.2s ease', background: filter === 'ALL' ? 'var(--primary-color)' : 'var(--bg-main)', color: filter === 'ALL' ? '#fff' : 'var(--text-muted)' }}>
+                    All
+                  </button>
+                  <button onClick={() => setFilter('BUY')} style={{ padding: '0.5rem 1.5rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', transition: 'all 0.2s ease', background: filter === 'BUY' ? 'rgba(22, 163, 74, 0.15)' : 'var(--bg-main)', color: filter === 'BUY' ? 'var(--success-color)' : 'var(--text-muted)' }}>
+                    Buy
+                  </button>
+                  <button onClick={() => setFilter('SELL')} style={{ padding: '0.5rem 1.5rem', borderRadius: '20px', border: 'none', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem', transition: 'all 0.2s ease', background: filter === 'SELL' ? 'rgba(220, 38, 38, 0.15)' : 'var(--bg-main)', color: filter === 'SELL' ? 'var(--error-color)' : 'var(--text-muted)' }}>
+                    Sell
+                  </button>
                 </div>
 
                 {/* Table for Desktop */}
-                <div className="transactions-table-wrapper glass-card">
-                  <table className="transactions-table">
-                    <thead>
+                <div className="table-responsive">
+                  <table className="transactions-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead style={{ background: 'var(--bg-main)' }}>
                       <tr>
-                        <th>Date & Time</th>
-                        <th>Type</th>
-                        <th>Stock</th>
-                        <th>Quantity</th>
-                        <th>Price</th>
-                        <th>Total</th>
-                        <th>Status</th>
+                        <th style={{ padding: '1rem 1.5rem', textAlign: 'left', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Date & Time</th>
+                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Type</th>
+                        <th style={{ padding: '1rem', textAlign: 'left', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Stock</th>
+                        <th style={{ padding: '1rem', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Quantity</th>
+                        <th style={{ padding: '1rem', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Price</th>
+                        <th style={{ padding: '1rem', textAlign: 'right', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Total Amount</th>
+                        <th style={{ padding: '1rem 1.5rem', textAlign: 'center', color: 'var(--text-muted)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredTransactions.map((tx) => (
-                        <tr key={tx.id}>
-                          <td>{formatDate(tx.created_at)}</td>
-                          <td>
-                            <span className={`tx-badge ${tx.transaction_type === 'BUY' ? 'tx-buy' : 'tx-sell'}`}>
+                        <tr key={tx.id} style={{ borderBottom: '1px solid var(--card-border)' }}>
+                          <td style={{ padding: '1.25rem 1.5rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>{formatDate(tx.created_at)}</td>
+                          <td style={{ padding: '1.25rem 1rem' }}>
+                            <span style={{ padding: '0.35rem 0.75rem', borderRadius: '6px', fontSize: '0.85rem', fontWeight: '600', background: tx.transaction_type === 'BUY' ? 'rgba(22, 163, 74, 0.1)' : 'rgba(220, 38, 38, 0.1)', color: tx.transaction_type === 'BUY' ? 'var(--success-color)' : 'var(--error-color)' }}>
                               {tx.transaction_type}
                             </span>
                           </td>
-                          <td className="tx-symbol">{tx.symbol}</td>
-                          <td>{tx.quantity}</td>
-                          <td>{formatCurrency(tx.price)}</td>
-                          <td style={{ fontWeight: 500 }}>{formatCurrency(tx.total_amount)}</td>
-                          <td>
-                            <span className="tx-status-completed">COMPLETED</span>
+                          <td style={{ padding: '1.25rem 1rem', fontWeight: '700', color: 'var(--text-main)', fontSize: '1.05rem' }}>{tx.symbol}</td>
+                          <td style={{ padding: '1.25rem 1rem', textAlign: 'right', color: 'var(--text-main)' }}>{tx.quantity}</td>
+                          <td style={{ padding: '1.25rem 1rem', textAlign: 'right', color: 'var(--text-main)' }}>{formatCurrency(tx.price)}</td>
+                          <td style={{ padding: '1.25rem 1rem', textAlign: 'right', fontWeight: '700', color: 'var(--text-main)' }}>{formatCurrency(tx.total_amount)}</td>
+                          <td style={{ padding: '1.25rem 1.5rem', textAlign: 'center' }}>
+                            <span style={{ padding: '0.35rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: '600', background: 'rgba(100, 116, 139, 0.1)', color: 'var(--text-muted)' }}>
+                              ✓ COMPLETED
+                            </span>
                           </td>
                         </tr>
                       ))}
                       {filteredTransactions.length === 0 && (
                         <tr>
-                          <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                            No {filter} transactions found.
+                          <td colSpan="7" style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
+                            <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>📭</div>
+                            <div style={{ fontSize: '1.1rem', fontWeight: '500' }}>No {filter} transactions found.</div>
                           </td>
                         </tr>
                       )}
                     </tbody>
                   </table>
-                </div>
-
-                {/* Cards for Mobile */}
-                <div className="transactions-mobile-list">
-                  {filteredTransactions.map((tx) => (
-                    <div key={tx.id} className="tx-mobile-card glass-card">
-                      <div className="tx-card-header">
-                        <div className="tx-card-title">
-                          <span className={`tx-badge ${tx.transaction_type === 'BUY' ? 'tx-buy' : 'tx-sell'}`}>
-                            {tx.transaction_type}
-                          </span>
-                          <span className="tx-symbol">{tx.symbol}</span>
-                        </div>
-                        <span className="tx-status-completed">✓ COMPLETED</span>
-                      </div>
-                      
-                      <div className="tx-card-body">
-                        <div className="tx-detail">
-                          <span className="lbl">Quantity</span>
-                          <span className="val">{tx.quantity}</span>
-                        </div>
-                        <div className="tx-detail">
-                          <span className="lbl">Price</span>
-                          <span className="val">{formatCurrency(tx.price)}</span>
-                        </div>
-                        <div className="tx-meta">
-                          <span className="lbl">Total</span>
-                          <span className="val" style={{ fontWeight: 600, color: 'var(--text-main)' }}>{formatCurrency(tx.total_amount)}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="tx-card-footer">
-                        <span className="tx-date">{formatDate(tx.created_at)}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {filteredTransactions.length === 0 && (
-                    <div className="glass-card" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                      No {filter} transactions found.
-                    </div>
-                  )}
                 </div>
               </div>
             )}
