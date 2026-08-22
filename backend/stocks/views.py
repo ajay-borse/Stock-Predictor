@@ -895,3 +895,234 @@ class PortfolioAnalyticsView(APIView):
                 analytics
             }
         )
+# ============================================================
+# MARKET OVERVIEW
+# ============================================================
+
+class MarketOverviewView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cache_key = "market_overview_data"
+        cached_data = cache.get(cache_key)
+        
+        if cached_data is not None:
+            return Response(cached_data)
+
+        # 1. Market Indices
+        indices_map = {
+            "^NSEI": "NIFTY 50",
+            "^BSESN": "SENSEX",
+            "^NSEBANK": "NIFTY BANK",
+            "^INDIAVIX": "INDIA VIX"
+        }
+        
+        indices_data = []
+        for symbol, name in indices_map.items():
+            try:
+                data = download_stock(symbol)
+                if data is not None and not data.empty:
+                    if hasattr(data.columns, "nlevels") and data.columns.nlevels > 1:
+                        data.columns = data.columns.get_level_values(0)
+                        
+                    latest_close = float(data["Close"].iloc[-1])
+                    prev_close = float(data["Close"].iloc[-2]) if len(data) > 1 else latest_close
+                    change = latest_close - prev_close
+                    pct_change = (change / prev_close) * 100 if prev_close != 0 else 0
+                    
+                    indices_data.append({
+                        "name": name,
+                        "symbol": symbol,
+                        "price": latest_close,
+                        "change": change,
+                        "change_percent": pct_change
+                    })
+            except Exception:
+                continue
+
+        # 2. Popular Stocks
+        popular_symbols = [
+            "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", 
+            "ICICIBANK.NS", "SBIN.NS", "TATAMOTORS.NS", "ITC.NS"
+        ]
+        
+        popular_stocks_data = []
+        for symbol in popular_symbols:
+            try:
+                data = download_stock(symbol)
+                if data is not None and not data.empty:
+                    if hasattr(data.columns, "nlevels") and data.columns.nlevels > 1:
+                        data.columns = data.columns.get_level_values(0)
+                        
+                    latest_close = float(data["Close"].iloc[-1])
+                    prev_close = float(data["Close"].iloc[-2]) if len(data) > 1 else latest_close
+                    change = latest_close - prev_close
+                    pct_change = (change / prev_close) * 100 if prev_close != 0 else 0
+                    
+                    popular_stocks_data.append({
+                        "symbol": symbol,
+                        "price": latest_close,
+                        "change": change,
+                        "change_percent": pct_change
+                    })
+            except Exception:
+                continue
+
+        # 3. Top Movers (Gainers / Losers)
+        sorted_by_change = sorted(popular_stocks_data, key=lambda x: x["change_percent"])
+        losers = sorted_by_change[:3] if len(sorted_by_change) >= 3 else sorted_by_change
+        gainers = sorted_by_change[-3:] if len(sorted_by_change) >= 3 else sorted_by_change
+        gainers.reverse()
+
+        # 4. Market Status (Approximate logic: just check if it's weekday)
+        import datetime
+        now = datetime.datetime.now()
+        # Simple heuristic: weekday and time between 9:15 and 15:30 IST
+        # We'll just return OPEN or CLOSED for simplicity, or "CLOSED" if it's weekend
+        market_status = "OPEN"
+        if now.weekday() >= 5:
+            market_status = "CLOSED"
+        
+        response_data = {
+            "market_status": market_status,
+            "indices": indices_data,
+            "popular_stocks": popular_stocks_data[:6],
+            "gainers": gainers,
+            "losers": losers
+        }
+        
+        cache.set(cache_key, response_data, 300)  # 5 minutes cache
+        
+        return Response(response_data)
+
+# ============================================================
+# STOCK SEARCH
+# ============================================================
+
+class StockSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get("q", "").strip()
+        if not query:
+            return Response([])
+
+        query_lower = query.lower()
+        cache_key = f"stock_search_{query_lower}"
+        cached_data = cache.get(cache_key)
+        if cached_data is not None:
+            return Response(cached_data)
+
+        results_dict = {}
+
+        # 1. Local curated Indian stocks
+        POPULAR_INDIAN_STOCKS = [
+            {"symbol": "RELIANCE.NS", "name": "Reliance Industries"},
+            {"symbol": "TCS.NS", "name": "Tata Consultancy Services"},
+            {"symbol": "HDFCBANK.NS", "name": "HDFC Bank"},
+            {"symbol": "ICICIBANK.NS", "name": "ICICI Bank"},
+            {"symbol": "INFY.NS", "name": "Infosys"},
+            {"symbol": "SBIN.NS", "name": "State Bank of India"},
+            {"symbol": "BHARTIARTL.NS", "name": "Bharti Airtel"},
+            {"symbol": "ITC.NS", "name": "ITC Limited"},
+            {"symbol": "LT.NS", "name": "Larsen & Toubro"},
+            {"symbol": "BAJFINANCE.NS", "name": "Bajaj Finance"},
+            {"symbol": "KOTAKBANK.NS", "name": "Kotak Mahindra Bank"},
+            {"symbol": "HINDUNILVR.NS", "name": "Hindustan Unilever"},
+            {"symbol": "AXISBANK.NS", "name": "Axis Bank"},
+            {"symbol": "WIPRO.NS", "name": "Wipro"},
+            {"symbol": "ASIANPAINT.NS", "name": "Asian Paints"},
+            {"symbol": "HCLTECH.NS", "name": "HCL Technologies"},
+            {"symbol": "MARUTI.NS", "name": "Maruti Suzuki"},
+            {"symbol": "SUNPHARMA.NS", "name": "Sun Pharmaceutical"},
+            {"symbol": "TITAN.NS", "name": "Titan Company"},
+            {"symbol": "TATAMOTORS.NS", "name": "Tata Motors"},
+            {"symbol": "NTPC.NS", "name": "NTPC Limited"},
+            {"symbol": "TATASTEEL.NS", "name": "Tata Steel"},
+            {"symbol": "POWERGRID.NS", "name": "Power Grid Corporation"},
+            {"symbol": "BAJAJFINSV.NS", "name": "Bajaj Finserv"},
+            {"symbol": "M&M.NS", "name": "Mahindra & Mahindra"},
+            {"symbol": "ONGC.NS", "name": "ONGC"},
+            {"symbol": "COALINDIA.NS", "name": "Coal India"}
+        ]
+
+        for s in POPULAR_INDIAN_STOCKS:
+            if query_lower in s['symbol'].lower() or query_lower in s['name'].lower():
+                results_dict[s['symbol']] = {
+                    "symbol": s['symbol'],
+                    "name": s['name'],
+                    "exchange": "NSE",
+                    "type": "EQUITY"
+                }
+
+        # 2. Yahoo Finance Search (for wider coverage)
+        try:
+            import yfinance as yf
+            # If the user's query is short, we append " India" just for the yfinance search to help it find Indian stocks,
+            # but only if the user hasn't explicitly specified .NS or .BO
+            yf_query = query
+            if len(query) <= 4 and '.' not in query:
+                yf_query = query + " India"
+                
+            search_res = yf.Search(yf_query, max_results=30)
+            if hasattr(search_res, 'quotes'):
+                for q in search_res.quotes:
+                    symbol = q.get('symbol', '')
+                    if not symbol:
+                        continue
+                        
+                    # STRICTLY FILTER ONLY INDIAN STOCKS
+                    if symbol.endswith('.NS') or symbol.endswith('.BO'):
+                        if symbol not in results_dict:
+                            exch = "NSE" if symbol.endswith('.NS') else "BSE"
+                            results_dict[symbol] = {
+                                "symbol": symbol,
+                                "name": q.get('shortname', q.get('longname', '')),
+                                "exchange": exch,
+                                "type": "EQUITY"
+                            }
+                            
+            # Also try without " India" if we appended it and got nothing
+            if len(query) <= 4 and '.' not in query and len(results_dict) == 0:
+                search_res2 = yf.Search(query, max_results=30)
+                if hasattr(search_res2, 'quotes'):
+                    for q in search_res2.quotes:
+                        symbol = q.get('symbol', '')
+                        if symbol.endswith('.NS') or symbol.endswith('.BO'):
+                            if symbol not in results_dict:
+                                exch = "NSE" if symbol.endswith('.NS') else "BSE"
+                                results_dict[symbol] = {
+                                    "symbol": symbol,
+                                    "name": q.get('shortname', q.get('longname', '')),
+                                    "exchange": exch,
+                                    "type": "EQUITY"
+                                }
+
+        except Exception as e:
+            print(f"Search API error: {e}")
+
+        # 3. Sort Results
+        def get_rank(item):
+            sym = item['symbol'].lower()
+            name = item['name'].lower()
+            q = query_lower
+            
+            # Rank 1: Exact symbol match before dot (e.g. TCS == TCS.NS)
+            if sym.startswith(q + "."): return 1
+            # Rank 2: Symbol starts with query
+            if sym.startswith(q): return 2
+            # Rank 3: Name starts with query
+            if name.startswith(q): return 3
+            # Rank 4: Name contains query
+            if q in name: return 4
+            # Rank 5: Fallback NSE
+            if sym.endswith('.ns'): return 5
+            return 6
+
+        final_list = list(results_dict.values())
+        final_list = sorted(final_list, key=lambda x: (get_rank(x), x['symbol']))
+        final_list = final_list[:6]
+
+        cache.set(cache_key, final_list, 86400)
+        return Response(final_list)
+

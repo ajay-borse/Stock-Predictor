@@ -1,30 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import SmartSearch from '../components/SmartSearch';
 import api from '../utils/api';
 import '../App.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [searchSymbol, setSearchSymbol] = useState('');
   
   // States
   const [profile, setProfile] = useState(null);
   const [portfolio, setPortfolio] = useState(null);
   const [watchlist, setWatchlist] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [popularStocks, setPopularStocks] = useState([]);
   
+  // Market Overview State
+  const [marketOverview, setMarketOverview] = useState(null);
+  const [marketError, setMarketError] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [marketLoading, setMarketLoading] = useState(true);
 
-  // Popular symbols to track
-  const POPULAR_SYMBOLS = ['RELIANCE.NS', 'TCS.NS', 'INFY.NS', 'HDFCBANK.NS'];
+  const fetchMarketOverview = async () => {
+    setMarketLoading(true);
+    setMarketError(false);
+    try {
+      const res = await api.get('stocks/market-overview/');
+      setMarketOverview(res.data);
+    } catch (err) {
+      console.error("Market overview fetch error:", err);
+      setMarketError(true);
+    } finally {
+      setMarketLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        // Fetch authenticated data
         const [profRes, portRes, watchRes, transRes] = await Promise.allSettled([
           api.get('profile/'),
           api.get('stocks/portfolio/analytics/'),
@@ -37,31 +50,6 @@ const Dashboard = () => {
         if (watchRes.status === 'fulfilled') setWatchlist(watchRes.value.data);
         if (transRes.status === 'fulfilled') setTransactions(transRes.value.data);
 
-        // Fetch market overview data (popular stocks history for today's change)
-        const marketData = await Promise.allSettled(
-          POPULAR_SYMBOLS.map(sym => api.get(`stocks/history/?symbol=${sym}`))
-        );
-
-        const processedStocks = marketData.map((res, index) => {
-          const sym = POPULAR_SYMBOLS[index];
-          if (res.status === 'fulfilled' && res.value.data?.data?.length >= 2) {
-            const history = res.value.data.data;
-            const latest = history[history.length - 1];
-            const prev = history[history.length - 2];
-            const change = latest.close - prev.close;
-            const pctChange = (change / prev.close) * 100;
-            return {
-              symbol: sym,
-              price: latest.close,
-              change,
-              pctChange
-            };
-          }
-          return { symbol: sym, price: null, change: null, pctChange: null };
-        });
-
-        setPopularStocks(processedStocks.filter(s => s.price !== null));
-
       } catch (err) {
         console.error("Dashboard fetch error:", err);
       } finally {
@@ -70,14 +58,8 @@ const Dashboard = () => {
     };
 
     fetchDashboardData();
+    fetchMarketOverview();
   }, []);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchSymbol.trim()) {
-      navigate('/prediction', { state: { symbol: searchSymbol.trim().toUpperCase() } });
-    }
-  };
 
   const handleAnalyze = (symbol) => {
     navigate('/prediction', { state: { symbol } });
@@ -111,67 +93,148 @@ const Dashboard = () => {
       <Navbar />
 
       <main className="main-content">
-        {/* 1. Welcome Header */}
-        <header className="dashboard-header animate-fade-in" style={{ marginBottom: '2rem' }}>
+        {/* Welcome Header */}
+        <header className="dashboard-header animate-fade-in" style={{ marginBottom: '2rem', alignItems: 'flex-start' }}>
           <div className="dashboard-title-group">
-            <h2 style={{ fontSize: '1.75rem', fontWeight: '600' }}>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: '600', color: 'var(--text-main)' }}>
               {getGreeting()}, {profile?.username || 'Investor'}
             </h2>
-            <p style={{ color: 'var(--text-muted)' }}>Your AI-powered market overview</p>
+            <p style={{ color: 'var(--text-muted)' }}>Track today's market at a glance.</p>
           </div>
           
           <div className="search-widget" style={{ width: '100%', maxWidth: '400px' }}>
-            <form onSubmit={handleSearch}>
-              <div className="search-wrapper" style={{ display: 'flex', gap: '0.5rem' }}>
-                <input
-                  type="text"
-                  className="premium-input"
-                  placeholder="Search stocks..."
-                  value={searchSymbol}
-                  onChange={(e) => setSearchSymbol(e.target.value)}
-                  style={{ textTransform: 'uppercase' }}
-                />
-                <button type="submit" className="primary-btn" style={{ whiteSpace: 'nowrap', width: 'auto', padding: '0.5rem 1.5rem' }}>
-                  Analyze
-                </button>
-              </div>
-            </form>
+            <SmartSearch onSelect={handleAnalyze} />
           </div>
         </header>
 
-        {loading ? (
-          <div className="skeleton-dashboard animate-fade-in">
-            <div className="skeleton-grid">
-              {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-box" style={{ height: '120px' }}></div>)}
-            </div>
-            <div className="skeleton-box" style={{ height: '300px', marginTop: '2rem' }}></div>
+        {/* MARKET OVERVIEW SECTION */}
+        <section className="market-overview-section" style={{ marginBottom: '2.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+            <h3 style={{ fontSize: '1.25rem', color: 'var(--text-main)', margin: 0 }}>Market Overview</h3>
+            {marketOverview && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: marketOverview.market_status === 'OPEN' ? 'rgba(22, 163, 74, 0.1)' : 'rgba(100, 116, 139, 0.1)', padding: '0.4rem 0.8rem', borderRadius: '20px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: marketOverview.market_status === 'OPEN' ? 'var(--success-color)' : 'var(--text-muted)' }}></div>
+                <span style={{ fontSize: '0.85rem', fontWeight: 600, color: marketOverview.market_status === 'OPEN' ? 'var(--success-color)' : 'var(--text-muted)' }}>
+                  Market {marketOverview.market_status === 'OPEN' ? 'Open' : 'Closed'}
+                </span>
+              </div>
+            )}
           </div>
+
+          {marketLoading ? (
+            <div className="skeleton-dashboard animate-fade-in">
+              <div className="skeleton-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', marginBottom: '1.5rem' }}>
+                {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-box" style={{ height: '100px' }}></div>)}
+              </div>
+              <div className="skeleton-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <div className="skeleton-box" style={{ height: '300px' }}></div>
+                <div className="skeleton-box" style={{ height: '300px' }}></div>
+              </div>
+            </div>
+          ) : marketError ? (
+            <div className="glass-card" style={{ padding: '3rem', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>Market data is temporarily unavailable. Please try again shortly.</p>
+              <button className="primary-btn" onClick={fetchMarketOverview} style={{ width: 'auto' }}>Retry</button>
+            </div>
+          ) : marketOverview ? (
+            <>
+              {/* Indices */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+                {marketOverview.indices.map(idx => (
+                  <div key={idx.symbol} className="glass-card" style={{ padding: '1.25rem' }}>
+                    <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.5rem' }}>{idx.name}</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{idx.price.toFixed(2)}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span className={getProfitClass(idx.change)} style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                        {idx.change > 0 ? '↑' : (idx.change < 0 ? '↓' : '')} {Math.abs(idx.change).toFixed(2)}
+                      </span>
+                      <span className={getProfitClass(idx.change_percent)} style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                        ({formatPercentage(idx.change_percent)})
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Movers & Popular */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
+                
+                {/* Top Movers */}
+                <div className="glass-card" style={{ padding: '1.5rem' }}>
+                  <h4 style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '1rem', marginTop: 0 }}>Top Market Movers</h4>
+                  <div style={{ display: 'flex', gap: '1.5rem' }}>
+                    
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 600 }}>Gainers</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {marketOverview.gainers.map(stock => (
+                          <div key={stock.symbol} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
+                            <div>
+                              <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{stock.symbol.replace('.NS', '')}</div>
+                              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{formatCurrency(stock.price)}</div>
+                            </div>
+                            <div className="metric-positive" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                              {formatPercentage(stock.change_percent)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 600 }}>Losers</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                        {marketOverview.losers.map(stock => (
+                          <div key={stock.symbol} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
+                            <div>
+                              <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{stock.symbol.replace('.NS', '')}</div>
+                              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{formatCurrency(stock.price)}</div>
+                            </div>
+                            <div className="metric-negative" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                              {formatPercentage(stock.change_percent)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
+                {/* Popular Stocks */}
+                <div className="glass-card" style={{ padding: '1.5rem' }}>
+                  <h4 style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '1rem', marginTop: 0 }}>Popular Stocks</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
+                    {marketOverview.popular_stocks.map(stock => (
+                      <div key={stock.symbol} style={{ display: 'flex', flexDirection: 'column', padding: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+                          <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{stock.symbol.replace('.NS', '')}</span>
+                          <span className={getProfitClass(stock.change_percent)} style={{ fontWeight: 600, fontSize: '0.85rem' }}>{formatPercentage(stock.change_percent)}</span>
+                        </div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem' }}>{formatCurrency(stock.price)}</div>
+                        <button className="secondary-btn" onClick={() => handleAnalyze(stock.symbol)} style={{ fontSize: '0.8rem', padding: '0.4rem', width: '100%' }}>Analyze</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </>
+          ) : null}
+        </section>
+
+
+        {/* EXISTING DASHBOARD BOTTOM AREA */}
+        {loading ? (
+           <div className="skeleton-dashboard animate-fade-in">
+             <div className="skeleton-box" style={{ height: '200px' }}></div>
+           </div>
         ) : (
           <div className="dashboard-grid animate-fade-in stagger-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
             
             {/* Left Column */}
             <div className="dashboard-col-left" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
-              {/* Market Overview */}
-              <div className="glass-card stagger-2" style={{ padding: '1.5rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', marginBottom: '1.25rem', color: 'var(--text-main)' }}>Market Overview</h3>
-                {popularStocks.length > 0 ? (
-                  <div className="popular-stocks-list" style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                    {popularStocks.map(stock => (
-                      <div key={stock.symbol} className="popular-stock-item" onClick={() => handleAnalyze(stock.symbol)} style={{ minWidth: '140px', padding: '1rem', background: 'var(--bg-surface)', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--card-border)', transition: 'all 0.2s ease' }}>
-                        <div style={{ fontWeight: 600, color: 'var(--text-main)', marginBottom: '0.5rem' }}>{stock.symbol.replace('.NS', '')}</div>
-                        <div style={{ color: 'var(--text-main)', fontWeight: 500, fontSize: '1.1rem' }}>{formatCurrency(stock.price)}</div>
-                        <div className={getProfitClass(stock.pctChange)} style={{ fontSize: '0.85rem', fontWeight: 500, marginTop: '0.25rem' }}>
-                          {formatPercentage(stock.pctChange)}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Market data currently unavailable.</p>
-                )}
-              </div>
-
               {/* Portfolio Snapshot */}
               <div className="glass-card stagger-3" style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -209,28 +272,16 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-              
-              {/* Market Insights */}
-              <div className="glass-card stagger-5" style={{ padding: '1.5rem', background: 'var(--bg-surface)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>AI Market Insight</h3>
-                </div>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: '1.6', margin: 0 }}>
-                  Our AI models process historical data, volume trends, and momentum indicators to forecast potential stock movements. Use the quick analyze tool to run deep neural analysis on specific equities before making investment decisions.
-                </p>
-              </div>
-
             </div>
 
             {/* Right Column */}
             <div className="dashboard-col-right" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
-              {/* Watchlist Preview */}
+              {/* Watchlist Section */}
               <div className="glass-card stagger-4" style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Watchlist</h3>
-                  <button className="secondary-btn" onClick={() => navigate('/watchlist')} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}>View Watchlist</button>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Your Watchlist</h3>
+                  <button className="secondary-btn" onClick={() => navigate('/watchlist')} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}>View All</button>
                 </div>
 
                 {watchlist && watchlist.length > 0 ? (
@@ -238,15 +289,18 @@ const Dashboard = () => {
                     {watchlist.slice(0, 4).map(item => (
                       <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 1rem', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.symbol}</span>
+                          <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.symbol.replace('.NS', '')}</span>
                         </div>
-                        <button className="secondary-btn" onClick={() => handleAnalyze(item.symbol)} style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}>Analyze</button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <button className="secondary-btn" onClick={() => handleAnalyze(item.symbol)} style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}>Analyze</button>
+                        </div>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="empty-state-compact" style={{ textAlign: 'center', padding: '2rem 0', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No stocks in watchlist.</p>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Your watchlist is empty.</p>
+                    <button className="primary-btn" onClick={() => navigate('/prediction')} style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', width: 'auto' }}>Explore Stocks</button>
                   </div>
                 )}
               </div>
@@ -260,10 +314,10 @@ const Dashboard = () => {
 
                 {transactions && transactions.length > 0 ? (
                   <div className="transactions-compact-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {transactions.slice(0, 4).map(tx => (
+                    {transactions.slice(0, 3).map(tx => (
                       <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 1rem', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
                         <div>
-                          <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{tx.symbol}</div>
+                          <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{tx.symbol.replace('.NS', '')}</div>
                           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>{new Date(tx.created_at).toLocaleDateString()}</div>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -280,29 +334,6 @@ const Dashboard = () => {
                     <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No recent transactions.</p>
                   </div>
                 )}
-              </div>
-
-              {/* Quick Actions */}
-              <div className="glass-card stagger-6" style={{ padding: '1.5rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1.1rem', marginBottom: '1.25rem', color: 'var(--text-main)' }}>Quick Actions</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                  <button className="secondary-btn" onClick={() => navigate('/prediction')} style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-surface)' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    Analyze Stock
-                  </button>
-                  <button className="secondary-btn" onClick={() => navigate('/portfolio')} style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-surface)' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                    Portfolio
-                  </button>
-                  <button className="secondary-btn" onClick={() => navigate('/watchlist')} style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-surface)' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-                    Watchlist
-                  </button>
-                  <button className="secondary-btn" onClick={() => navigate('/transactions')} style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', background: 'var(--bg-surface)' }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                    Transactions
-                  </button>
-                </div>
               </div>
 
             </div>

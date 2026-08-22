@@ -1,6 +1,8 @@
 from django.urls import path
 
 from .views import (
+    StockSearchView,
+    MarketOverviewView,
     StockPredictionView,
     StockHistoryView,
     WatchlistView,
@@ -13,6 +15,18 @@ from .views import (
 
 
 urlpatterns = [
+    # Stock Search
+    path(
+        "search/",
+        StockSearchView.as_view()
+    ),
+
+    # Market Overview
+    path(
+        "market-overview/",
+        MarketOverviewView.as_view()
+    ),
+
 
     # Stock prediction
     path(

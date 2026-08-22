@@ -5,6 +5,7 @@ import HistoricalChart from '../components/HistoricalChart';
 import Navbar from '../components/Navbar';
 import TransactionModal from '../components/TransactionModal';
 import { useToast, Toast } from '../components/Toast';
+import SmartSearch from '../components/SmartSearch';
 import '../App.css';
 
 function StockPredictor() {
@@ -113,9 +114,9 @@ function StockPredictor() {
     }
   };
 
-  const handlePredict = async (e) => {
-    e?.preventDefault(); 
-    executePrediction(symbol);
+  const handleSearchSelect = (sym) => {
+    setSymbol(sym);
+    executePrediction(sym);
   };
 
   // Derive metrics safely from the exact returned response
@@ -186,27 +187,15 @@ function StockPredictor() {
 
         <div className="glass-card">
           {!error && (
-            <form onSubmit={handlePredict}>
-              <div className="search-wrapper">
-                <input
-                  id="stock-symbol"
-                  type="text"
-                  className="premium-input"
-                  placeholder="Stock Symbol (e.g. TCS.NS)"
-                  value={symbol}
-                  onChange={(e) => setSymbol(e.target.value)}
-                  disabled={loading}
-                  style={{ textTransform: 'uppercase' }}
-                />
-                <button 
-                  type="submit" 
-                  className="primary-btn"
-                  disabled={loading}
-                >
-                  Analyze with AI
-                </button>
-              </div>
-            </form>
+            <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+              <SmartSearch 
+                initialValue={symbol} 
+                onSelect={handleSearchSelect} 
+                isLoading={loading}
+                buttonText="Analyze with AI"
+                placeholder="Stock Symbol (e.g. TCS.NS)"
+              />
+            </div>
           )}
 
           {error && (
