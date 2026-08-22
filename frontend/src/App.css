@@ -98,8 +98,86 @@
   animation: pulse 2s infinite;
 }
 
-@media (max-width: 768px) {
-  .nav-links { display: none; }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.hamburger-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0.5rem;
+  z-index: 60;
+}
+
+.hamburger-line {
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger-line.line-1-open { transform: translateY(8px) rotate(45deg); }
+.hamburger-line.line-2-open { opacity: 0; }
+.hamburger-line.line-3-open { transform: translateY(-8px) rotate(-45deg); }
+
+.mobile-logout-btn {
+  display: none;
+  margin-top: auto;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .hamburger-btn {
+    display: flex;
+  }
+
+  .desktop-logout-btn {
+    display: none;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: rgba(10, 10, 15, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid var(--card-border);
+    flex-direction: column;
+    padding: 5rem 2rem 2rem 2rem;
+    transition: right 0.3s ease;
+    z-index: 40;
+    align-items: flex-start;
+    gap: 1.5rem;
+    box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+  }
+
+  .nav-links.mobile-open {
+    right: 0;
+  }
+
+  .nav-links a {
+    width: 100%;
+    font-size: 1.1rem;
+    padding-bottom: 0.5rem;
+  }
+  
+  .nav-links a.active::after {
+    bottom: 0;
+  }
+
+  .mobile-logout-btn {
+    display: block;
+  }
 }
 
 /* ==========================================================================
@@ -2250,4 +2328,40 @@
 @keyframes flowAnimV {
   0% { top: -100%; }
   100% { top: 100%; }
+}
+
+/* ==========================================================================
+   MISSION 11 - DASHBOARD
+   ========================================================================== */
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 1rem;
+}
+
+.dashboard-title-group h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.dashboard-title-group p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
