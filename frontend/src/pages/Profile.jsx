@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
 
@@ -67,7 +67,7 @@ function Profile() {
     };
 
     return (
-        <div className="app-container">
+        <div className="app-container page-transition">
             <Navbar />
 
             <main className="main-content">

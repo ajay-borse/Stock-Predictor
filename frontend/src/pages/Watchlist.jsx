@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import Navbar from '../components/Navbar';
@@ -20,7 +20,7 @@ const Watchlist = () => {
   const openBuyModal = (sym) => setModal({ isOpen: true, type: 'buy', symbol: sym, availableShares: 0 });
   const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
   
-  const handleTransactionSuccess = (sym, type) => {
+  const handleTransactionSuccess = (sym) => {
     closeModal();
     showToast(`✓ ${sym} purchased successfully.`);
   };
@@ -73,7 +73,7 @@ const Watchlist = () => {
   }, []);
 
   const handleAnalyze = (symbol) => {
-    navigate('/prediction', { state: { symbol } });
+    navigate(`/stock/${symbol}`);
   };
 
   const confirmRemove = async (symbol) => {
@@ -83,6 +83,7 @@ const Watchlist = () => {
       setWatchlist(watchlist.filter(item => item.symbol !== symbol));
       showToast(`✓ ${symbol} removed from your watchlist.`);
     } catch (err) {
+      console.error(err);
       showToast(`⚠️ Unable to remove ${symbol}. Please try again.`);
     } finally {
       setRemovingSymbol(null);
@@ -106,7 +107,7 @@ const Watchlist = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container page-transition">
       <Navbar />
 
       <main className="main-content">

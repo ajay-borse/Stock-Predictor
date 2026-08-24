@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../utils/api';
 import '../App.css'; 
 
@@ -23,7 +23,7 @@ const SmartSearch = ({ onSelect, initialValue = '', placeholder = 'Search stocks
         setRecentSearches(JSON.parse(stored));
       }
     } catch (e) {
-      console.error('Failed to load recent searches');
+      console.error('Failed to load recent searches', e);
     }
   }, []);
 
@@ -97,7 +97,9 @@ const SmartSearch = ({ onSelect, initialValue = '', placeholder = 'Search stocks
     setRecentSearches(newRecents);
     try {
       localStorage.setItem('recentSearches', JSON.stringify(newRecents));
-    } catch (e) {}
+    } catch (e) {
+      // Ignored
+    }
 
     if (onSelect) {
       onSelect(symbol);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import SmartSearch from '../components/SmartSearch';
@@ -14,10 +14,11 @@ const Dashboard = () => {
   const [watchlist, setWatchlist] = useState([]);
   const [transactions, setTransactions] = useState([]);
   
+  const [loading, setLoading] = useState(true);
+  
   // Market Overview State
   const [marketOverview, setMarketOverview] = useState(null);
   const [marketError, setMarketError] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [marketLoading, setMarketLoading] = useState(true);
 
   const fetchMarketOverview = async () => {
@@ -62,7 +63,7 @@ const Dashboard = () => {
   }, []);
 
   const handleAnalyze = (symbol) => {
-    navigate('/prediction', { state: { symbol } });
+    navigate(`/stock/${symbol}`);
   };
 
   const formatCurrency = (val) => {
@@ -88,8 +89,32 @@ const Dashboard = () => {
     return 'Good evening';
   };
 
+  const getDisplayName = () => {
+    if (!profile) return 'Investor';
+    if (profile.first_name) return profile.first_name;
+    return profile.username || 'Investor';
+  };
+
+  // Generate responsible AI summary based on real data
+  let aiSummaryText = "Your personalized market overview is ready. ";
+  if (portfolio && portfolio.total_invested > 0) {
+     if (portfolio.profit_loss_percentage > 0) {
+         aiSummaryText += "Your portfolio is currently showing a positive return. ";
+     } else if (portfolio.profit_loss_percentage < 0) {
+         aiSummaryText += "Your portfolio is currently experiencing a drawdown. ";
+     }
+  } else {
+     aiSummaryText += "You haven't made any investments yet. ";
+  }
+
+  if (watchlist && watchlist.length > 0) {
+     aiSummaryText += "You are actively tracking " + watchlist.length + " stocks in your watchlist.";
+  } else {
+     aiSummaryText += "Consider adding stocks to your watchlist to track market movements.";
+  }
+
   return (
-    <div className="app-container">
+    <div className="app-container page-transition">
       <Navbar />
 
       <main className="main-content">
@@ -97,9 +122,9 @@ const Dashboard = () => {
         <header className="dashboard-header animate-fade-in" style={{ marginBottom: '2rem', alignItems: 'flex-start' }}>
           <div className="dashboard-title-group">
             <h2 style={{ fontSize: '1.75rem', fontWeight: '600', color: 'var(--text-main)' }}>
-              {getGreeting()}, {profile?.username || 'Investor'}
+              {getGreeting()}, {getDisplayName()}
             </h2>
-            <p style={{ color: 'var(--text-muted)' }}>Track today's market at a glance.</p>
+            <p style={{ color: 'var(--text-muted)' }}>Your personalized market overview.</p>
           </div>
           
           <div className="search-widget" style={{ width: '100%', maxWidth: '400px' }}>
@@ -122,112 +147,47 @@ const Dashboard = () => {
           </div>
 
           {marketLoading ? (
-            <div className="skeleton-dashboard animate-fade-in">
-              <div className="skeleton-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', marginBottom: '1.5rem' }}>
-                {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-box" style={{ height: '100px' }}></div>)}
-              </div>
-              <div className="skeleton-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
-                <div className="skeleton-box" style={{ height: '300px' }}></div>
-                <div className="skeleton-box" style={{ height: '300px' }}></div>
-              </div>
+            <div className="skeleton-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', marginBottom: '1.5rem', display: 'grid', gap: '1rem' }}>
+              {[1, 2, 3, 4].map(i => <div key={i} className="skeleton-box" style={{ height: '100px' }}></div>)}
             </div>
           ) : marketError ? (
-            <div className="glass-card" style={{ padding: '3rem', textAlign: 'center' }}>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>Market data is temporarily unavailable. Please try again shortly.</p>
-              <button className="primary-btn" onClick={fetchMarketOverview} style={{ width: 'auto' }}>Retry</button>
+            <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>Unable to load market data.</p>
+              <button className="secondary-btn" onClick={fetchMarketOverview} style={{ width: 'auto', padding: '0.5rem 1rem' }}>Retry</button>
             </div>
           ) : marketOverview ? (
-            <>
-              {/* Indices */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-                {marketOverview.indices.map(idx => (
-                  <div key={idx.symbol} className="glass-card" style={{ padding: '1.25rem' }}>
-                    <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.5rem' }}>{idx.name}</div>
-                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{idx.price.toFixed(2)}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span className={getProfitClass(idx.change)} style={{ fontSize: '0.9rem', fontWeight: 600 }}>
-                        {idx.change > 0 ? '↑' : (idx.change < 0 ? '↓' : '')} {Math.abs(idx.change).toFixed(2)}
-                      </span>
-                      <span className={getProfitClass(idx.change_percent)} style={{ fontSize: '0.9rem', fontWeight: 600 }}>
-                        ({formatPercentage(idx.change_percent)})
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Movers & Popular */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
-                
-                {/* Top Movers */}
-                <div className="glass-card" style={{ padding: '1.5rem' }}>
-                  <h4 style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '1rem', marginTop: 0 }}>Top Market Movers</h4>
-                  <div style={{ display: 'flex', gap: '1.5rem' }}>
-                    
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 600 }}>Gainers</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {marketOverview.gainers.map(stock => (
-                          <div key={stock.symbol} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
-                            <div>
-                              <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{stock.symbol.replace('.NS', '')}</div>
-                              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{formatCurrency(stock.price)}</div>
-                            </div>
-                            <div className="metric-positive" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                              {formatPercentage(stock.change_percent)}
-                            </div>
-                          </div>
-                        ))}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+              {marketOverview.indices.map(idx => (
+                <div key={idx.symbol} className="glass-card" style={{ padding: '1.25rem' }}>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.5rem' }}>{idx.name}</div>
+                  {idx.price !== undefined && idx.price !== null ? (
+                    <>
+                      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '0.25rem' }}>{idx.price.toFixed(2)}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span className={getProfitClass(idx.change)} style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                          {idx.change > 0 ? '↑' : (idx.change < 0 ? '↓' : '')} {Math.abs(idx.change).toFixed(2)}
+                        </span>
+                        <span className={getProfitClass(idx.change_percent)} style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                          ({formatPercentage(idx.change_percent)})
+                        </span>
                       </div>
-                    </div>
-
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.75rem', fontWeight: 600 }}>Losers</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {marketOverview.losers.map(stock => (
-                          <div key={stock.symbol} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
-                            <div>
-                              <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{stock.symbol.replace('.NS', '')}</div>
-                              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{formatCurrency(stock.price)}</div>
-                            </div>
-                            <div className="metric-negative" style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                              {formatPercentage(stock.change_percent)}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                  </div>
+                    </>
+                  ) : (
+                    <div style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>Data unavailable</div>
+                  )}
                 </div>
-
-                {/* Popular Stocks */}
-                <div className="glass-card" style={{ padding: '1.5rem' }}>
-                  <h4 style={{ fontSize: '1.1rem', color: 'var(--text-main)', marginBottom: '1rem', marginTop: 0 }}>Popular Stocks</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-                    {marketOverview.popular_stocks.map(stock => (
-                      <div key={stock.symbol} style={{ display: 'flex', flexDirection: 'column', padding: '0.75rem', background: 'var(--bg-surface)', border: '1px solid var(--card-border)', borderRadius: '8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-                          <span style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{stock.symbol.replace('.NS', '')}</span>
-                          <span className={getProfitClass(stock.change_percent)} style={{ fontWeight: 600, fontSize: '0.85rem' }}>{formatPercentage(stock.change_percent)}</span>
-                        </div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem' }}>{formatCurrency(stock.price)}</div>
-                        <button className="secondary-btn" onClick={() => handleAnalyze(stock.symbol)} style={{ fontSize: '0.8rem', padding: '0.4rem', width: '100%' }}>Analyze</button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-            </>
+              ))}
+            </div>
           ) : null}
         </section>
 
-
-        {/* EXISTING DASHBOARD BOTTOM AREA */}
         {loading ? (
            <div className="skeleton-dashboard animate-fade-in">
-             <div className="skeleton-box" style={{ height: '200px' }}></div>
+             <div className="skeleton-box" style={{ height: '150px', marginBottom: '2rem' }}></div>
+             <div className="skeleton-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                <div className="skeleton-box" style={{ height: '300px' }}></div>
+                <div className="skeleton-box" style={{ height: '300px' }}></div>
+             </div>
            </div>
         ) : (
           <div className="dashboard-grid animate-fade-in stagger-1" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.5rem' }}>
@@ -235,6 +195,16 @@ const Dashboard = () => {
             {/* Left Column */}
             <div className="dashboard-col-left" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
+              {/* AI Daily Summary */}
+              <div className="glass-card stagger-2" style={{ padding: '1.5rem', background: 'linear-gradient(to right, rgba(79, 70, 229, 0.05), transparent)' }}>
+                 <h3 style={{ margin: '0 0 0.75rem 0', fontSize: '1.1rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ color: 'var(--primary-color)' }}>✦</span> AI Market Summary
+                 </h3>
+                 <p style={{ color: 'var(--text-main)', lineHeight: 1.5, fontSize: '0.95rem', margin: 0 }}>
+                    {aiSummaryText}
+                 </p>
+              </div>
+
               {/* Portfolio Snapshot */}
               <div className="glass-card stagger-3" style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -268,7 +238,7 @@ const Dashboard = () => {
                 ) : (
                   <div className="empty-state-compact" style={{ textAlign: 'center', padding: '2rem 0', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
                     <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>Your portfolio is currently empty.</p>
-                    <button className="primary-btn" onClick={() => navigate('/prediction')} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', width: 'auto' }}>Start Investing</button>
+                    <button className="primary-btn" onClick={() => navigate('/prediction')} style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', width: 'auto' }}>Explore Stocks</button>
                   </div>
                 )}
               </div>
@@ -292,7 +262,7 @@ const Dashboard = () => {
                           <span style={{ fontWeight: 600, color: 'var(--text-main)' }}>{item.symbol.replace('.NS', '')}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                          <button className="secondary-btn" onClick={() => handleAnalyze(item.symbol)} style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}>Analyze</button>
+                          <button className="secondary-btn" onClick={() => handleAnalyze(item.symbol)} style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}>View</button>
                         </div>
                       </div>
                     ))}
@@ -308,13 +278,13 @@ const Dashboard = () => {
               {/* Recent Transactions */}
               <div className="glass-card stagger-5" style={{ padding: '1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Recent Transactions</h3>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-main)' }}>Recent Activity</h3>
                   <button className="secondary-btn" onClick={() => navigate('/transactions')} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}>View All</button>
                 </div>
 
                 {transactions && transactions.length > 0 ? (
                   <div className="transactions-compact-list" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {transactions.slice(0, 3).map(tx => (
+                    {transactions.slice(0, 4).map(tx => (
                       <div key={tx.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 1rem', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
                         <div>
                           <div style={{ fontWeight: 600, color: 'var(--text-main)', fontSize: '0.95rem' }}>{tx.symbol.replace('.NS', '')}</div>
@@ -331,7 +301,7 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <div className="empty-state-compact" style={{ textAlign: 'center', padding: '2rem 0', background: 'var(--bg-surface)', borderRadius: '8px', border: '1px solid var(--card-border)' }}>
-                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No recent transactions.</p>
+                    <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>No recent activity.</p>
                   </div>
                 )}
               </div>

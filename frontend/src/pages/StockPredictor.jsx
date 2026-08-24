@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import api from '../utils/api';
 import HistoricalChart from '../components/HistoricalChart';
 import Navbar from '../components/Navbar';
@@ -14,11 +14,6 @@ function StockPredictor() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  const [loadingMessages] = useState([
-    "Analyzing stock..."
-  ]);
-
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [inWatchlist, setInWatchlist] = useState(false);
@@ -30,23 +25,10 @@ function StockPredictor() {
 
   const openBuyModal = (sym) => setModal({ isOpen: true, type: 'buy', symbol: sym, availableShares: 0 });
   const closeModal = () => setModal(prev => ({ ...prev, isOpen: false }));
-  const handleTransactionSuccess = (sym, type) => {
+  const handleTransactionSuccess = (sym) => {
     closeModal();
     showToast(`✓ ${sym} purchased successfully.`);
   };
-
-  useEffect(() => {
-    if (location.state?.symbol) {
-      const sym = location.state.symbol;
-      setSymbol(sym);
-      executePrediction(sym);
-      window.history.replaceState({}, document.title);
-    }
-  }, [location.state]);
-
-  useEffect(() => {
-    // simplified loading without interval as requested
-  }, [loading]);
 
   const checkWatchlistStatus = async (sym) => {
     try {
@@ -102,7 +84,7 @@ function StockPredictor() {
 
       setPrediction(response.data);
       checkWatchlistStatus(response.data.symbol);
-    } catch (err) {
+    } catch {
       setError({
         title: "Oops! Something went wrong",
         message: "Please try again later.",
@@ -113,6 +95,19 @@ function StockPredictor() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (location.state?.symbol) {
+      const sym = location.state.symbol;
+      setSymbol(sym);
+      executePrediction(sym);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    // simplified loading without interval as requested
+  }, [loading]);
 
   const handleSearchSelect = (sym) => {
     setSymbol(sym);
@@ -153,10 +148,10 @@ function StockPredictor() {
     movementText = "Moderate";
   }
 
-  let aiExpects = "";
-  let aiComparison = "";
-  let modelInterp = "";
-  let directionIcon = "";
+  let aiExpects;
+  let aiComparison;
+  let modelInterp;
+  let directionIcon;
 
   if (direction === "UPWARD") {
     aiExpects = "AI expects a potential upward movement based on the current prediction.";
@@ -176,7 +171,7 @@ function StockPredictor() {
   }
 
   return (
-    <div className="app-container">
+    <div className="app-container page-transition">
       <Navbar />
 
       <main className="main-content">

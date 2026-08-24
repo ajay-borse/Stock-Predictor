@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
@@ -21,7 +21,7 @@ const Navbar = () => {
       setNotifications(res.data.notifications || []);
       setUnreadCount(res.data.unread_count || 0);
     } catch (err) {
-      console.error("Unable to load notifications");
+      console.error("Unable to load notifications", err);
     } finally {
       setNotifLoading(false);
     }
@@ -71,7 +71,7 @@ const Navbar = () => {
       setUnreadCount(0);
       setNotifications(notifications.map(n => ({ ...n, is_read: true })));
     } catch (err) {
-      console.error("Failed to mark all as read");
+      console.error("Failed to mark all as read", err);
     }
   };
 

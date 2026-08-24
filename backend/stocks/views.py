@@ -73,15 +73,9 @@ class StockHistoryView(APIView):
 
         if cached_data is not None:
 
-            print(
-                f"Returning cached historical data for: {symbol}"
-            )
 
             return Response(cached_data)
 
-        print(
-            f"Cache miss. Downloading historical data for: {symbol}"
-        )
 
         data = download_stock(symbol)
 
@@ -169,9 +163,6 @@ class StockHistoryView(APIView):
             HISTORY_CACHE_TIMEOUT
         )
 
-        print(
-            f"Historical data cached for: {symbol}"
-        )
 
         return Response(response_data)
 
@@ -298,7 +289,7 @@ class BuyStockView(APIView):
 
         symbol = request.data.get("symbol")
         quantity = request.data.get("quantity")
-        price = request.data.get("price")
+        # We ignore frontend price for security
 
         if not symbol:
 
@@ -333,29 +324,24 @@ class BuyStockView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        import math
         try:
-            price = Decimal(str(price))
-
-        except (
-            InvalidOperation,
-            TypeError,
-            ValueError
-        ):
-
+            data = download_stock(symbol)
+            if data is None or data.empty:
+                raise ValueError("No data")
+            if hasattr(data.columns, "nlevels") and data.columns.nlevels > 1:
+                data.columns = data.columns.get_level_values(0)
+            latest_close = float(data["Close"].iloc[-1])
+            if not math.isfinite(latest_close):
+                raise ValueError("Invalid close price")
+            price = Decimal(str(latest_close))
+            if price <= 0:
+                raise ValueError("Price must be > 0")
+        except Exception:
             return Response(
                 {
                     "error":
-                    "Price must be a valid number"
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if price <= 0:
-
-            return Response(
-                {
-                    "error":
-                    "Price must be greater than 0"
+                    "Unable to fetch current market price for this stock. Please try again later."
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
@@ -448,7 +434,7 @@ class SellStockView(APIView):
 
         symbol = request.data.get("symbol")
         quantity = request.data.get("quantity")
-        price = request.data.get("price")
+        # We ignore frontend price for security
 
         if not symbol:
 
@@ -485,29 +471,24 @@ class SellStockView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        import math
         try:
-            price = Decimal(str(price))
-
-        except (
-            InvalidOperation,
-            TypeError,
-            ValueError
-        ):
-
+            data = download_stock(symbol)
+            if data is None or data.empty:
+                raise ValueError("No data")
+            if hasattr(data.columns, "nlevels") and data.columns.nlevels > 1:
+                data.columns = data.columns.get_level_values(0)
+            latest_close = float(data["Close"].iloc[-1])
+            if not math.isfinite(latest_close):
+                raise ValueError("Invalid close price")
+            price = Decimal(str(latest_close))
+            if price <= 0:
+                raise ValueError("Price must be > 0")
+        except Exception:
             return Response(
                 {
                     "error":
-                    "Price must be a valid number"
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        if price <= 0:
-
-            return Response(
-                {
-                    "error":
-                    "Price must be greater than 0"
+                    "Unable to fetch current market price for this stock. Please try again later."
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )

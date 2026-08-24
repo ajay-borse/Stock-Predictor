@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import StockPredictor from './pages/StockPredictor';
+import StockDetails from './pages/StockDetails';
 import Watchlist from './pages/Watchlist';
 import Portfolio from './pages/Portfolio';
 import Transactions from './pages/Transactions';
@@ -63,7 +64,20 @@ function App() {
         />
 
 
-        {/* =========================
+                {/* =========================
+            STOCK DETAILS
+        ========================= */}
+
+        <Route
+          path="/stock/:symbol"
+          element={
+            <ProtectedRoute>
+              <StockDetails />
+            </ProtectedRoute>
+          }
+        />
+
+{/* =========================
             WATCHLIST
         ========================= */}
 

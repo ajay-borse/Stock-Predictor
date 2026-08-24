@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
@@ -54,7 +54,7 @@ const Transactions = () => {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container page-transition">
       <Navbar />
 
       <main className="main-content">

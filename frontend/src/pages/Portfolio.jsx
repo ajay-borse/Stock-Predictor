@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import api from '../utils/api';
@@ -9,7 +9,6 @@ import '../App.css';
 const Portfolio = () => {
   const navigate = useNavigate();
   const [portfolio, setPortfolio] = useState(null);
-  const [transactions, setTransactions] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { toast, showToast } = useToast();
@@ -25,12 +24,8 @@ const Portfolio = () => {
     try {
       setLoading(true);
       setError(null);
-      const [portfolioRes, transactionsRes] = await Promise.all([
-        api.get('stocks/portfolio/analytics/'),
-        api.get('stocks/transactions/')
-      ]);
+      const portfolioRes = await api.get('stocks/portfolio/analytics/');
       setPortfolio(portfolioRes.data);
-      setTransactions(transactionsRes.data);
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Your session has expired. Please login again.");
@@ -63,7 +58,7 @@ const Portfolio = () => {
   };
 
   const handleAnalyze = (symbol) => {
-    navigate('/prediction', { state: { symbol } });
+    navigate(`/stock/${symbol}`);
   };
 
   const formatCurrency = (val) => {
@@ -93,7 +88,7 @@ const Portfolio = () => {
   const currentWidth = `${(currentValue / maxBarValue) * 100}%`;
 
   return (
-    <div className="app-container">
+    <div className="app-container page-transition">
       <Navbar />
       
       <main className="main-content">

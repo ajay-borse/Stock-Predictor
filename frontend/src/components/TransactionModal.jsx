@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../utils/api';
 
 const TransactionModal = ({ isOpen, type, symbol, availableShares, onClose, onSuccess }) => {
@@ -11,30 +11,30 @@ const TransactionModal = ({ isOpen, type, symbol, availableShares, onClose, onSu
 
   // Reset form and fetch price when modal opens
   useEffect(() => {
+    const fetchCurrentPrice = async () => {
+      setPriceLoading(true);
+      setPriceError(null);
+      setCurrentPrice(null);
+      try {
+        const response = await api.post('stocks/predict/', { symbol });
+        if (response && response.data && typeof response.data.current_price === 'number' && response.data.current_price > 0 && Number.isFinite(response.data.current_price)) {
+          setCurrentPrice(response.data.current_price);
+        } else {
+          setPriceError("Current market price unavailable.\nPlease try again later.");
+        }
+      } catch (err) {
+        setPriceError("Current market price unavailable.\nPlease try again later.", err);
+      } finally {
+        setPriceLoading(false);
+      }
+    };
+
     if (isOpen) {
       setModalForm({ quantity: '' });
       setModalError('');
       fetchCurrentPrice();
     }
   }, [isOpen, symbol]);
-
-  const fetchCurrentPrice = async () => {
-    setPriceLoading(true);
-    setPriceError(null);
-    setCurrentPrice(null);
-    try {
-      const response = await api.post('stocks/predict/', { symbol });
-      if (response && response.data && typeof response.data.current_price === 'number' && response.data.current_price > 0 && Number.isFinite(response.data.current_price)) {
-        setCurrentPrice(response.data.current_price);
-      } else {
-        setPriceError("Current market price unavailable.\nPlease try again later.");
-      }
-    } catch (err) {
-      setPriceError("Current market price unavailable.\nPlease try again later.");
-    } finally {
-      setPriceLoading(false);
-    }
-  };
 
   if (!isOpen) return null;
 

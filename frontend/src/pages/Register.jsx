@@ -125,7 +125,7 @@ function Register() {
         let gError = null;
 
         for (const [key, value] of Object.entries(backendErrors)) {
-          if (formData.hasOwnProperty(key)) {
+          if (Object.prototype.hasOwnProperty.call(formData, key)) {
             mappedErrors[key] = Array.isArray(value) ? value[0] : value;
           } else {
             gError = Array.isArray(value) ? value[0] : value;

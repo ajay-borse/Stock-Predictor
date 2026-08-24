@@ -1,0 +1,40 @@
+﻿# Virtual Environments
+venv/
+.venv/
+env/
+
+# Node
+node_modules/
+dist/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials
+passwords.txt
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Temporary / Backup files
+*.tmp
+*.bak
+backend/models/*.pkl
