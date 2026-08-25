@@ -242,6 +242,7 @@ SECURE_HSTS_PRELOAD = config(
     cast=bool
 )
 
+
 SECURE_CONTENT_TYPE_NOSNIFF = config(
     "SECURE_CONTENT_TYPE_NOSNIFF",
     default=True,

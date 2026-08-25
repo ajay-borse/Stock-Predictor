@@ -1,10 +1,14 @@
 import axios from 'axios';
 
-// Production backend URL
-const API_BASE_URL = 'https://stockmind-ai-backend-38f2.onrender.com/api/';
+// Production backend URL or local fallback
+const rawBaseURL =
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://stockmind-ai-backend-38f2.onrender.com/api/';
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: rawBaseURL.endsWith('/')
+    ? rawBaseURL
+    : `${rawBaseURL}/`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -76,7 +80,7 @@ api.interceptors.response.use(
       if (refreshToken && REFRESH_ENDPOINT_URL) {
         try {
           const response = await axios.post(
-            `${API_BASE_URL}${REFRESH_ENDPOINT_URL}`,
+            `${api.defaults.baseURL}${REFRESH_ENDPOINT_URL}`,
             {
               refresh: refreshToken,
             }
