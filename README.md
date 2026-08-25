@@ -166,6 +166,44 @@ StockMind AI follows a modern **client-server architecture**, where the React fr
                    │    Database    │
                    └────────────────┘
 
+🔄 Prediction Workflow
 
+Historical Stock Data
+          │
+          ▼
+   Data Processing
+          │
+          ▼
+  Last 10 Days Data
+          │
+          ▼
+ Prediction Model
+          │
+          ▼
+ ┌────────┴────────┐
+ ▼                 ▼
+📈 UPWARD       📉 DOWNWARD
+          │
+          ▼
+   React Dashboard
+
+🌐 Deployment Architecture
+        ┌─────────────────┐
+        │     Vercel      │
+        │ React Frontend  │
+        └────────┬────────┘
+                 │
+                 │ HTTPS / REST API
+                 ▼
+        ┌─────────────────┐
+        │     Render      │
+        │ Django Backend  │
+        └────────┬────────┘
+                 │
+                 ▼
+        ┌─────────────────┐
+        │   PostgreSQL    │
+        │    Database     │
+        └─────────────────┘
 
       
