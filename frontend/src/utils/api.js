@@ -1,22 +1,24 @@
 import axios from 'axios';
 
-// Ensure baseURL always ends with a trailing slash to prevent path resolution issues
-let rawBaseURL = 'https://stockmind-ai-backend-38f2.onrender.com/api/';
-if (!rawBaseURL.endsWith('/')) {
-  rawBaseURL += '/';
-}
+// Production backend URL
+const API_BASE_URL = 'https://stockmind-ai-backend-38f2.onrender.com/api/';
 
 const api = axios.create({
-  baseURL: rawBaseURL,
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Request interceptor to add the access token
+// Add JWT access token to every request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
+
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => {
@@ -24,61 +26,122 @@ api.interceptors.request.use(
   }
 );
 
-// Configuration constant for refresh endpoint 
-// (Update this when backend provides a refresh endpoint, e.g., 'token/refresh/')
+// Refresh endpoint
+// Currently not configured
 export const REFRESH_ENDPOINT_URL = null;
 
-// Response interceptor for handling 401 and refresh
+// Response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
+
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response) {
-      const status = error.response.status;
+    // Network error
+    if (!error.response) {
+      console.error(
+        'Network error / Backend unreachable:',
+        error.message
+      );
 
-      // Do not intercept if the request is to login or register itself
-      const isAuthRequest = originalRequest.url.includes('login') || originalRequest.url.includes('register');
+      return Promise.reject(error);
+    }
 
-      if (status === 401 && !originalRequest._retry && !isAuthRequest) {
-        originalRequest._retry = true;
+    const status = error.response.status;
 
-        const refreshToken = localStorage.getItem('refresh_token');
+    // Make sure originalRequest exists
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
-        if (refreshToken && REFRESH_ENDPOINT_URL) {
-          try {
-            const response = await axios.post(`${api.defaults.baseURL}${REFRESH_ENDPOINT_URL}`, {
-              refresh: refreshToken
-            });
+    // Don't intercept login/register requests
+    const requestURL = originalRequest.url || '';
 
-            localStorage.setItem('access_token', response.data.access);
-            originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
+    const isAuthRequest =
+      requestURL.includes('login') ||
+      requestURL.includes('register');
 
-            return api(originalRequest);
-          } catch (refreshError) {
-            localStorage.removeItem('access_token');
-            localStorage.removeItem('refresh_token');
-            window.location.href = '/login';
-            return Promise.reject(refreshError);
-          }
-        } else {
-          // No refresh URL configured or no token, require re-login
+    // Handle 401
+    if (
+      status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRequest
+    ) {
+      originalRequest._retry = true;
+
+      const refreshToken = localStorage.getItem('refresh_token');
+
+      if (refreshToken && REFRESH_ENDPOINT_URL) {
+        try {
+          const response = await axios.post(
+            `${API_BASE_URL}${REFRESH_ENDPOINT_URL}`,
+            {
+              refresh: refreshToken,
+            }
+          );
+
+          const newAccessToken = response.data.access;
+
+          localStorage.setItem(
+            'access_token',
+            newAccessToken
+          );
+
+          originalRequest.headers.Authorization =
+            `Bearer ${newAccessToken}`;
+
+          return api(originalRequest);
+
+        } catch (refreshError) {
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
+
           window.location.href = '/login';
+
+          return Promise.reject(refreshError);
         }
       }
 
-      // Centralized error logging
-      if (status === 400) console.error("Bad Request / Validation Error:", error.response.data);
-      else if (status === 401) console.error("Unauthorized:", error.response.data);
-      else if (status === 403) console.error("Forbidden:", error.response.data);
-      else if (status === 404) console.error("Endpoint not found:", error.response.config.url);
-      else if (status === 422) console.error("Validation error:", error.response.data);
-      else if (status >= 500) console.error("Backend server error:", error.response.data);
+      // No refresh token available
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
 
-    } else {
-      console.error("Network error / Backend unreachable:", error.message);
+      window.location.href = '/login';
+    }
+
+    // Error logging
+    if (status === 400) {
+      console.error(
+        'Bad Request / Validation Error:',
+        error.response.data
+      );
+    } else if (status === 401) {
+      console.error(
+        'Unauthorized:',
+        error.response.data
+      );
+    } else if (status === 403) {
+      console.error(
+        'Forbidden:',
+        error.response.data
+      );
+    } else if (status === 404) {
+      console.error(
+        'Endpoint not found:',
+        error.response.config?.url
+      );
+    } else if (status === 422) {
+      console.error(
+        'Validation error:',
+        error.response.data
+      );
+    } else if (status >= 500) {
+      console.error(
+        'Backend server error:',
+        error.response.data
+      );
     }
 
     return Promise.reject(error);
