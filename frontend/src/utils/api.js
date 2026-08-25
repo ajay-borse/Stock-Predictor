@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Ensure baseURL always ends with a trailing slash to prevent path resolution issues
-let rawBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/';
+let rawBaseURL = 'https://stockmind-ai-backend-38f2.onrender.com/api/';
 if (!rawBaseURL.endsWith('/')) {
   rawBaseURL += '/';
 }
@@ -26,7 +26,7 @@ api.interceptors.request.use(
 
 // Configuration constant for refresh endpoint 
 // (Update this when backend provides a refresh endpoint, e.g., 'token/refresh/')
-export const REFRESH_ENDPOINT_URL = null; 
+export const REFRESH_ENDPOINT_URL = null;
 
 // Response interceptor for handling 401 and refresh
 api.interceptors.response.use(
@@ -36,24 +36,24 @@ api.interceptors.response.use(
 
     if (error.response) {
       const status = error.response.status;
-      
+
       // Do not intercept if the request is to login or register itself
       const isAuthRequest = originalRequest.url.includes('login') || originalRequest.url.includes('register');
 
       if (status === 401 && !originalRequest._retry && !isAuthRequest) {
         originalRequest._retry = true;
-        
+
         const refreshToken = localStorage.getItem('refresh_token');
-        
+
         if (refreshToken && REFRESH_ENDPOINT_URL) {
           try {
             const response = await axios.post(`${api.defaults.baseURL}${REFRESH_ENDPOINT_URL}`, {
               refresh: refreshToken
             });
-            
+
             localStorage.setItem('access_token', response.data.access);
             originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
-            
+
             return api(originalRequest);
           } catch (refreshError) {
             localStorage.removeItem('access_token');
@@ -68,7 +68,7 @@ api.interceptors.response.use(
           window.location.href = '/login';
         }
       }
-      
+
       // Centralized error logging
       if (status === 400) console.error("Bad Request / Validation Error:", error.response.data);
       else if (status === 401) console.error("Unauthorized:", error.response.data);
@@ -76,11 +76,11 @@ api.interceptors.response.use(
       else if (status === 404) console.error("Endpoint not found:", error.response.config.url);
       else if (status === 422) console.error("Validation error:", error.response.data);
       else if (status >= 500) console.error("Backend server error:", error.response.data);
-      
+
     } else {
       console.error("Network error / Backend unreachable:", error.message);
     }
-    
+
     return Promise.reject(error);
   }
 );
