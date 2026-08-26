@@ -1,8 +1,14 @@
-# 📈 StockMind AI
+<div align="center">
 
-### Intelligent Stock Prediction & Portfolio Management Platform
+📈 StockMind AI
 
-> StockMind AI is a full-stack financial technology platform designed to help users analyze market data, predict next-day stock price direction, and manage their investment activity through a unified web application.
+Intelligent Stock Prediction & Portfolio Management Platform
+
+Full-Stack Stock Intelligence • Prediction • Portfolio Management
+
+</div>
+
+StockMind AI is a full-stack financial technology platform designed to help users analyze market data, predict next-day stock price direction, and manage their investment activity through a unified web application.
 
 <p align="center">
 
@@ -15,6 +21,7 @@
   <img src="https://img.shields.io/badge/Authentication-JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white" alt="JWT">
 
   <img src="https://img.shields.io/badge/Deployment-Vercel%20%7C%20Render-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Deployment">
+  <img src="https://img.shields.io/badge/Accuracy-74%25-00C853?style=for-the-badge" alt="74% Accuracy">
 
 </p>
 
@@ -26,104 +33,177 @@
 
 </p>
 
----
+<div align="center">
 
-### 🎯 What StockMind AI Does
+Features •
+Architecture •
+Tech Stack •
+API •
+Deployment •
+Security
 
-StockMind AI combines **historical market-data analysis, predictive modeling, and portfolio management** into a single full-stack application.
+</div>
+
+🎯 What StockMind AI Does
+
+StockMind AI combines historical market-data analysis, predictive modeling, and portfolio management into a single full-stack application.
 
 The platform currently provides:
 
-- 📊 Historical stock-data analysis
-- 🤖 Next-day **Upward / Downward** price-direction prediction
-- 🎯 **74% prediction accuracy**
-- 💼 Portfolio management
-- ⭐ Watchlist functionality
-- 💰 Transaction tracking
-- 🔐 JWT-based authentication
-- 👤 User profile management
-- 🔌 RESTful API architecture
-- ☁️ Production deployment with Vercel & Render
+📊 Historical stock-data analysis
 
-## ✨ Core Features
+🤖 Next-day Upward / Downward price-direction prediction
 
-### 🤖 Intelligent Stock Prediction
-- Analyzes the previous **10 days of historical stock data**.
-- Predicts next-day stock movement as **Upward 📈 or Downward 📉**.
-- Achieves approximately **74% prediction accuracy** on the evaluated data.
+🎯 74% prediction accuracy
 
-### 📊 Market Analysis
-- Retrieves and processes historical stock-market data.
-- Presents prediction results through an interactive web interface.
+💼 Portfolio management
 
-### 💼 Portfolio Management
-- Create and manage personal stock portfolios.
-- Track investment holdings and portfolio activity.
+⭐ Watchlist functionality
 
-### ⭐ Watchlist
-- Add and manage stocks you want to monitor.
-- Quickly access selected stocks for analysis.
+💰 Transaction tracking
 
-### 💰 Transaction Management
-- Record and manage investment transactions.
-- Maintain transaction history for portfolio tracking.
+🔐 JWT-based authentication
 
-### 🔐 Secure Authentication
-- JWT-based user authentication.
-- Secure registration and login.
-- Protected API endpoints.
-- Access and refresh token support.
-- User profile management.
+👤 User profile management
 
-### 🔌 RESTful API Architecture
-- Django REST Framework backend.
-- APIs for authentication, stocks, portfolios, and transactions.
-- Axios-based frontend-backend integration.
-- Centralized API authorization and error handling.
+🔌 RESTful API architecture
 
-### ☁️ Production Deployment
-- React frontend deployed on **Vercel**.
-- Django REST backend deployed on **Render**.
-- Production CORS and API configuration.
-- PostgreSQL support for production.
+☁️ Production deployment with Vercel & Render
 
----
+📊 Project Highlights
 
-## 🛠️ Technology Stack
+🎯 Prediction Accuracy
 
-### 🎨 Frontend
-- **React.js** — Component-based user interface
-- **Vite** — Fast frontend development and production build
-- **JavaScript** — Application logic and interactions
-- **Axios** — REST API communication
-- **HTML5 & CSS3** — Structure and responsive styling
+📅 Historical Window
 
-### ⚙️ Backend
-- **Python** — Backend and prediction logic
-- **Django** — Web application framework
-- **Django REST Framework** — RESTful API development
-- **Simple JWT** — Token-based authentication
+🔐 Authentication
 
-### 🗄️ Database
-- **PostgreSQL** — Production database
-- **SQLite** — Local development database
+☁️ Deployment
 
-### ☁️ Deployment
-- **Vercel** — Frontend hosting
-- **Render** — Backend hosting
+~74%
 
-### 🔧 Development Tools
-- **Git & GitHub**
-- **Postman**
-- **VS Code**
+10 Days
 
----
+JWT
 
-## 🏗️ System Architecture
+Vercel + Render
 
-StockMind AI follows a modern **client-server architecture**, where the React frontend communicates with the Django REST backend through secure REST APIs.
+Evaluation note: The reported ~74% accuracy is based on the evaluated data described by this project and should not be interpreted as a guarantee of future market performance.
 
-```text
+✨ Core Features
+
+🤖 Intelligent Stock Prediction
+
+Analyzes the previous 10 days of historical stock data.
+
+Predicts next-day stock movement as Upward 📈 or Downward 📉.
+
+Achieves approximately 74% prediction accuracy on the evaluated data.
+
+📊 Market Analysis
+
+Retrieves and processes historical stock-market data.
+
+Presents prediction results through an interactive web interface.
+
+💼 Portfolio Management
+
+Create and manage personal stock portfolios.
+
+Track investment holdings and portfolio activity.
+
+⭐ Watchlist
+
+Add and manage stocks you want to monitor.
+
+Quickly access selected stocks for analysis.
+
+💰 Transaction Management
+
+Record and manage investment transactions.
+
+Maintain transaction history for portfolio tracking.
+
+🔐 Secure Authentication
+
+JWT-based user authentication.
+
+Secure registration and login.
+
+Protected API endpoints.
+
+Access and refresh token support.
+
+User profile management.
+
+🔌 RESTful API Architecture
+
+Django REST Framework backend.
+
+APIs for authentication, stocks, portfolios, and transactions.
+
+Axios-based frontend-backend integration.
+
+Centralized API authorization and error handling.
+
+☁️ Production Deployment
+
+React frontend deployed on Vercel.
+
+Django REST backend deployed on Render.
+
+Production CORS and API configuration.
+
+PostgreSQL support for production.
+
+🛠️ Technology Stack
+
+🎨 Frontend
+
+React.js — Component-based user interface
+
+Vite — Fast frontend development and production build
+
+JavaScript — Application logic and interactions
+
+Axios — REST API communication
+
+HTML5 & CSS3 — Structure and responsive styling
+
+⚙️ Backend
+
+Python — Backend and prediction logic
+
+Django — Web application framework
+
+Django REST Framework — RESTful API development
+
+Simple JWT — Token-based authentication
+
+🗄️ Database
+
+PostgreSQL — Production database
+
+SQLite — Local development database
+
+☁️ Deployment
+
+Vercel — Frontend hosting
+
+Render — Backend hosting
+
+🔧 Development Tools
+
+Git & GitHub
+
+Postman
+
+VS Code
+
+🏗️ System Architecture
+
+StockMind AI follows a modern client-server architecture, where the React frontend communicates with the Django REST backend through secure REST APIs.
+
                          👤 USER
                            │
                            ▼
@@ -206,11 +286,8 @@ StockMind AI follows a modern **client-server architecture**, where the React fr
                    │    Database     │
                    └─────────────────┘
 
----
+📁 Project Structure
 
-## 📁 Project Structure
-
-```text
 StockPredictor/
 │
 ├── 📂 backend/
@@ -273,76 +350,110 @@ Make sure the following are installed:
 git clone YOUR_GITHUB_REPOSITORY_URL
 cd StockPredictor
 
-
----
-
-## 🔐 Environment Configuration
+🔐 Environment Configuration
 
 StockMind AI uses environment variables to separate configuration from source code and protect sensitive credentials.
 
-### 🎨 Frontend Configuration
+🎨 Frontend Configuration
 
-Create a `.env.local` file inside the `frontend/` directory:
+Create a .env.local file inside the frontend/ directory:
 
-```env
 VITE_API_BASE_URL=http://127.0.0.1:8000/api/
 
 ⚙️ Backend Configuration
+
 DJANGO_SECRET_KEY=your-secret-key
 DEBUG=False
 ALLOWED_HOSTS=your-domain
 DATABASE_URL=your-database-url
 CORS_ALLOWED_ORIGINS=your-frontend-url
 
----
+Keep real secrets and database credentials in environment variables. Do not commit .env files.
 
-## 📡 REST API
+📡 REST API
 
-StockMind AI uses a RESTful API architecture built with **Django REST Framework**.
+StockMind AI uses a RESTful API architecture built with Django REST Framework.
 
-### 🔐 Authentication
+🔐 Authentication
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/register/` | `POST` | Create a new user account |
-| `/api/login/` | `POST` | Authenticate user and obtain JWT tokens |
-| `/api/profile/` | `GET` | Retrieve authenticated user profile |
+Endpoint
 
-### 📈 Stock APIs
+Method
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/stocks/` | `GET` | Retrieve stock-related data |
+Description
 
-### 💼 Portfolio APIs
+/api/register/
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/portfolio/` | `GET / POST` | Retrieve or manage portfolio data |
+POST
 
-### 💰 Transaction APIs
+Create a new user account
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/transactions/` | `GET / POST` | Retrieve or create transaction records |
+/api/login/
 
-### 🔑 Authentication Header
+POST
+
+Authenticate user and obtain JWT tokens
+
+/api/profile/
+
+GET
+
+Retrieve authenticated user profile
+
+📈 Stock APIs
+
+Endpoint
+
+Method
+
+Description
+
+/api/stocks/
+
+GET
+
+Retrieve stock-related data
+
+💼 Portfolio APIs
+
+Endpoint
+
+Method
+
+Description
+
+/api/portfolio/
+
+GET / POST
+
+Retrieve or manage portfolio data
+
+💰 Transaction APIs
+
+Endpoint
+
+Method
+
+Description
+
+/api/transactions/
+
+GET / POST
+
+Retrieve or create transaction records
+
+🔑 Authentication Header
 
 Protected endpoints use JWT authentication:
 
-```http
 Authorization: Bearer <access_token>
 
+🤖 Stock Prediction System
 
----
+StockMind AI uses historical stock-market data to predict the next-day price direction.
 
-## 🤖 Stock Prediction System
+🔄 Prediction Pipeline
 
-StockMind AI uses historical stock-market data to predict the **next-day price direction**.
-
-### 🔄 Prediction Pipeline
-
-```text
 Historical Market Data
           │
           ▼
@@ -407,30 +518,26 @@ The React application was successfully verified using the production build proce
 ```bash
 npm run build
 
-
----
-
-## 🌐 Live Deployment
+🌐 Live Deployment
 
 StockMind AI is deployed using a separated frontend and backend architecture.
 
-### 🎨 Frontend — Vercel
+🎨 Frontend — Vercel
 
-The React/Vite application is deployed on **Vercel**.
+The React/Vite application is deployed on Vercel.
 
-🚀 **Live Application:**  
+🚀 Live Application:
 https://stock-predictor-o486.vercel.app/
 
-### ⚙️ Backend — Render
+⚙️ Backend — Render
 
-The Django REST Framework API is deployed on **Render**.
+The Django REST Framework API is deployed on Render.
 
-🔗 **Backend:**  
+🔗 Backend:
 https://stockmind-ai-backend-38f2.onrender.com/
 
-### 🔄 Production Architecture
+🔄 Production Architecture
 
-```text
                  🌐 USER
                     │
                     ▼
@@ -549,9 +656,10 @@ The project can be further extended with:
 
 ## 👨‍💻 Author
 
-### Ajay Borse
+### 👨‍💻 Ajay Borse
 
-Full-Stack Developer | Python | Django | React | Java
+**Full-Stack Developer**  
+Python • Django • React • Java
 
 <p align="left">
 
@@ -575,11 +683,11 @@ Your feedback and suggestions are always welcome.
 
 ---
 
-<p align="center">
-  <b>Built with ❤️ using Python, Django, React & modern web technologies.</b>
-</p>
+<div align="center">
 
-<p align="center">
-  <i>StockMind AI — Turning market data into actionable insights.</i>
-</p>
+**Built with ❤️ using Python, Django, React & modern web technologies.**
+
+*StockMind AI — Turning market data into actionable insights.*
+
+</div>
       
